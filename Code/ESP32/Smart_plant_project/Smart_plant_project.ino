@@ -127,8 +127,6 @@ void reconnect() {
     if (client.connect("ESPClient")) {
       Serial.println("connected");
       digitalWrite(LED_PIN_MQTT, HIGH); // LED ON
-      // client.subscribe("/EME/LED1/WIYAN");
-      // client.subscribe("/EME/LED2/WIYAN");
     } else {
       digitalWrite(LED_PIN_MQTT, LOW); // LED OFF
       Serial.print("failed, rc=");
@@ -178,22 +176,26 @@ void capacitiveSoilSensor() {
   // Convert raw reading to a percentage (constrained between 0% and 100%)
   int moisturePercent = map(sensorVal, AirValue, WaterValue, 0, 100);
   moisturePercent = constrain(moisturePercent, 0, 100);
-  String moisture = String(moisturePercent, 0);
+  String moisture = String(moisturePercent);
 
   const char* publishTopicMoisture = "/MOISTURE/V1";
   client.publish(publishTopicMoisture, moisture.c_str());
 
   Serial.print("Raw Value: ");
   Serial.print(sensorVal);
+  Serial.print(" | AirValue: ");
+  Serial.print(AirValue);
+  Serial.print(" | WaterValue: ");
+  Serial.print(WaterValue);
   Serial.print(" | Moisture: ");
-  Serial.print(moisturePercent);
+  Serial.print(moisture);
   Serial.println("%");
 }
 
 void waterLevelSensor() {
   // START Water Level Sensor
   int waterLevel = analogRead(WATER_SENSOR);
-  String waterLevelStr = String(waterLevel, 0);
+  String waterLevelStr = String(waterLevel);
 
   const char* publishTopicWaterLevel = "/WATER_LEVEL/V1";
   client.publish(publishTopicWaterLevel, waterLevelStr.c_str());
@@ -244,7 +246,6 @@ void tdsMeterSensor() {
 }
 
 void loop() {
-  Serial.println("");
   if (!client.connected()) {
     reconnect();
   }
@@ -269,6 +270,7 @@ void loop() {
   tdsMeterSensor();
   // END TDS Meter Sensor
 
+  Serial.println("");
   // Wait 5 seconds between measurements
   delay(5000);
 }
