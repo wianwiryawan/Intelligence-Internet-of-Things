@@ -57,7 +57,6 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 unsigned long lastMsg = 0;
 
-
 void setup_wifi() {
   delay(100);
   Serial.println();
@@ -144,8 +143,7 @@ void dht22Sensor() {
   // Read humidity and temperature
   float h = dht.readHumidity();
   float t = dht.readTemperature(); // Celsius by default
-  const char* publishTopicTemperature = "/EME/DHT1/TEMPERATURE/WIYAN";
-  const char* publishTopicHumidity = "/EME/DHT1/HUMIDITY/WIYAN";
+  
 
   // Check if readings failed
   if (isnan(h) || isnan(t)) {
@@ -158,11 +156,13 @@ void dht22Sensor() {
     lastMsg = now;
     
     // Convert float to String
-    String temperature = String(t, 2);
-    String humidity = String(h, 2);
+    String temperatureStr = String(t, 2);
+    String humidityStr = String(h, 2);
 
-    client.publish(publishTopicTemperature, temperature.c_str()); 
-    client.publish(publishTopicHumidity, humidity.c_str()); 
+    const char* publishTopicTemperature = "/TEMPERATURE/V1";
+    const char* publishTopicHumidity = "/HUMIDITY/V1";
+    client.publish(publishTopicTemperature, temperatureStr.c_str()); 
+    client.publish(publishTopicHumidity, humidityStr.c_str()); 
 
     Serial.print(F("Humidity: "));
     Serial.print(h);
@@ -178,6 +178,10 @@ void capacitiveSoilSensor() {
   // Convert raw reading to a percentage (constrained between 0% and 100%)
   int moisturePercent = map(sensorVal, AirValue, WaterValue, 0, 100);
   moisturePercent = constrain(moisturePercent, 0, 100);
+  String moisture = String(moisturePercent, 0);
+
+  const char* publishTopicMoisture = "/MOISTURE/V1";
+  client.publish(publishTopicMoisture, moisture.c_str());
 
   Serial.print("Raw Value: ");
   Serial.print(sensorVal);
@@ -189,6 +193,11 @@ void capacitiveSoilSensor() {
 void waterLevelSensor() {
   // START Water Level Sensor
   int waterLevel = analogRead(WATER_SENSOR);
+  String waterLevelStr = String(waterLevel, 0);
+
+  const char* publishTopicWaterLevel = "/WATER_LEVEL/V1";
+  client.publish(publishTopicWaterLevel, waterLevelStr.c_str());
+
   Serial.print("Water Level Value: ");
   Serial.println(waterLevel);
   // END Water Level Sensor
@@ -197,6 +206,10 @@ void waterLevelSensor() {
 void lightLevelSensor() {
   // Read light level in lux
   float lux = lightMeter.readLightLevel();
+  String luxLevelStr = String(lux, 2);
+
+  const char* publishTopicLuxLevel = "/LIGHT/V1";
+  client.publish(publishTopicLuxLevel, luxLevelStr.c_str());
 
   // Validate reading
   if (lux < 0) {
@@ -218,6 +231,11 @@ void tdsMeterSensor() {
                    - 255.86 * voltage * voltage
                    + 857.39 * voltage) * 0.5; // ppm
 
+  String ppmLevelStr = String(tdsValue, 2);
+
+  const char* publishTopicPpmLevel = "/PPM/V1";
+  client.publish(publishTopicPpmLevel, ppmLevelStr.c_str());
+
   Serial.print("Voltage: ");
   Serial.print(voltage, 2);
   Serial.print(" V  |  TDS: ");
@@ -226,6 +244,7 @@ void tdsMeterSensor() {
 }
 
 void loop() {
+  Serial.println("");
   if (!client.connected()) {
     reconnect();
   }
