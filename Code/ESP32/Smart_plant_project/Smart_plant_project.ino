@@ -97,16 +97,16 @@ void setup_light_sensor() {
 }
 
 void mqtt_callback(char* topic, byte* payload, unsigned int length) {
-  String string;
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
 
+  String string;
   for (int i = 0; i < length; i++) {
      string+=((char)payload[i]);  
   }
-
   Serial.print(string);
+  Serial.println("");
 
   if (String(topic) == "/RELAY_1/X1/V1") {
     if (string == "1") {
