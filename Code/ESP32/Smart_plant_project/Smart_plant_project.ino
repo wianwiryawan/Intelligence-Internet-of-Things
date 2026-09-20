@@ -108,13 +108,13 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
 
   Serial.print(string);
 
-  if (String(topic) == "RELAY_1/X1/V1") {
+  if (String(topic) == "/RELAY_1/X1/V1") {
     if (string == "1") {
       digitalWrite(RELAY1_PIN_1, HIGH);
     } else {
       digitalWrite(RELAY1_PIN_1, LOW);
     }
-  } else if (String(topic) == "RELAY_2/X1/V1") {
+  } else if (String(topic) == "/RELAY_2/X1/V1") {
     if (string == "1") {
       digitalWrite(RELAY1_PIN_2, HIGH);
     } else {
@@ -165,8 +165,8 @@ void reconnect() {
     if (client.connect("ESPClient")) {
       Serial.println("connected");
       
-      bool sub1 = client.subscribe("RELAY_1/X1/V1");
-      bool sub2 = client.subscribe("RELAY_2/X1/V1");
+      bool sub1 = client.subscribe("/RELAY_1/X1/V1");
+      bool sub2 = client.subscribe("/RELAY_2/X1/V1");
 
       Serial.print("Subscribe relay 1: ");
       Serial.println(sub1 ? "OK" : "FAILED");
