@@ -10,6 +10,10 @@
 // LED MQTT indicator
 #define LED_PIN_MQTT 2
 
+// 2 Way Module Relay HW-383
+#define RELAY1_PIN_1 12
+#define RELAY1_PIN_2 14
+
 // DHT Sensor
 #define DHTPIN 4     // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
@@ -92,11 +96,41 @@ void setup_light_sensor() {
   }
 }
 
+void mqtt_callback(char* topic, byte* payload, unsigned int length) {
+  String string;
+  Serial.print("Message arrived [");
+  Serial.print(topic);
+  Serial.print("] ");
+
+  for (int i = 0; i < length; i++) {
+     string+=((char)payload[i]);  
+  }
+
+  Serial.print(string);
+
+  if (String(topic) == "RELAY_1/X1/V1") {
+    if (string == "1") {
+      digitalWrite(RELAY1_PIN_1, HIGH);
+    } else {
+      digitalWrite(RELAY1_PIN_1, LOW);
+    }
+  } else if (String(topic) == "RELAY_2/X1/V1") {
+    if (string == "1") {
+      digitalWrite(RELAY1_PIN_2, HIGH);
+    } else {
+      digitalWrite(RELAY1_PIN_2, LOW);
+    }
+  }
+}
+
 void setup() {
   Serial.begin(9600);
 
   pinMode(LED_PIN_WIFI, OUTPUT); // WiFi indicator LED
   pinMode(LED_PIN_MQTT, OUTPUT); // MQTT indicator LED
+
+  pinMode(RELAY1_PIN_1, OUTPUT); // Relay 1 X1
+  pinMode(RELAY1_PIN_2, OUTPUT); // Relay 1 X2
 
   // START WiFi Setup
   setup_wifi();
@@ -108,6 +142,10 @@ void setup() {
   } else {
     client.setServer(localMqttServer, localMqttPort);
   }
+
+  // START MQTT Callback
+  client.setCallback(mqtt_callback);
+  // END MQTT Callback
   // END MQTT Setup
 
   // START DHT22 Setup
@@ -126,6 +164,16 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("ESPClient")) {
       Serial.println("connected");
+      
+      bool sub1 = client.subscribe("RELAY_1/X1/V1");
+      bool sub2 = client.subscribe("RELAY_2/X1/V1");
+
+      Serial.print("Subscribe relay 1: ");
+      Serial.println(sub1 ? "OK" : "FAILED");
+
+      Serial.print("Subscribe relay 2: ");
+      Serial.println(sub2 ? "OK" : "FAILED");
+
       digitalWrite(LED_PIN_MQTT, HIGH); // LED ON
     } else {
       digitalWrite(LED_PIN_MQTT, LOW); // LED OFF
@@ -249,6 +297,9 @@ void loop() {
   if (!client.connected()) {
     reconnect();
   }
+
+  // Process incoming MQTT messages first
+  client.loop();
 
   // START DHT22 Sensor
   dht22Sensor();
