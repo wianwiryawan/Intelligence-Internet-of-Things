@@ -15,11 +15,10 @@
 #define RELAY1_PIN_2 14
 
 // DHT Sensor
-#define DHTPIN 4     // Digital pin connected to the DHT sensor
+#define DHTPIN 4        // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 DHT dht(DHTPIN, DHTTYPE);
 
-// Define the analog pin connected to the sensor
 // Capacitive Soil Moisture Sensor
 const int sensorInPin = 35;
 
@@ -47,19 +46,44 @@ float averageAnalogRead() {
   return sum / (float)SCOUNT;
 }
 
-const char* ssid = "Kantin Belakang";
-const char* password = "PemudaTersesat27";
+const char* ssid = "LaptopLitya";
+const char* password = "binusplenger";
 
 // MQTT Server
 const bool isCloud = false;
 const char* cloudMqttServer = "broker.hivemq.com"; // MQTT cloud broker
 const int cloudMqttPort = 1883; // MQTT cloud port 
-const char* localMqttServer = "192.168.1.29"; // MQTT local broker
+const char* localMqttServer = "192.168.137.60"; // MQTT local broker
 const int localMqttPort = 1883; // MQTT local port
 
 WiFiClient espClient;
 PubSubClient client(espClient);
-unsigned long lastMsg = 0;
+
+// MQTT Topics
+const char* TOPIC_RELAY_1_X1   = "/RELAY_1/X1/V1";
+const char* TOPIC_RELAY_1_X2   = "/RELAY_1/X2/V1";
+const char* TOPIC_TEMPERATURE  = "/TEMPERATURE/V1";
+const char* TOPIC_HUMIDITY     = "/HUMIDITY/V1";
+const char* TOPIC_MOISTURE     = "/MOISTURE/V1";
+const char* TOPIC_WATER_LEVEL  = "/WATER_LEVEL/V1";
+const char* TOPIC_LIGHT        = "/LIGHT/V1";
+const char* TOPIC_TDS          = "/PPM/V1";
+
+const unsigned long SENSOR_INTERVAL = 5000;
+unsigned long lastSensorRead = 0;
+
+void publishTopic(const char* topicName, String value){
+  if(client.publish(topicName, value.c_str())) {
+    Serial.print("Published [");
+    Serial.print(topicName);
+    Serial.print("]: ");
+    Serial.println(value);
+  } else {
+    Serial.print("Failed to publish [");
+    Serial.print(topicName);
+    Serial.println("]");
+  };
+}
 
 void setup_wifi() {
   delay(100);
@@ -108,17 +132,17 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   Serial.print(string);
   Serial.println("");
 
-  if (String(topic) == "/RELAY_1/X1/V1") {
+  if (String(topic) == TOPIC_RELAY_1_X1) {
     if (string == "1") {
-      digitalWrite(RELAY1_PIN_1, HIGH);
-    } else {
       digitalWrite(RELAY1_PIN_1, LOW);
-    }
-  } else if (String(topic) == "/RELAY_2/X1/V1") {
-    if (string == "1") {
-      digitalWrite(RELAY1_PIN_2, HIGH);
     } else {
+      digitalWrite(RELAY1_PIN_1, HIGH);
+    }
+  } else if (String(topic) == TOPIC_RELAY_1_X2) {
+    if (string == "1") {
       digitalWrite(RELAY1_PIN_2, LOW);
+    } else {
+      digitalWrite(RELAY1_PIN_2, HIGH);
     }
   }
 }
@@ -137,15 +161,11 @@ void setup() {
   // END WiFi Setup
 
   // START MQTT Setup
-  if(isCloud){
-    client.setServer(cloudMqttServer, cloudMqttPort);
-  } else {
-    client.setServer(localMqttServer, localMqttPort);
-  }
-
-  // START MQTT Callback
+  const char* mqttServer = isCloud ? cloudMqttServer : localMqttServer;
+  const int mqttPort = isCloud ? cloudMqttPort : localMqttPort;
+  
+  client.setServer(mqttServer, mqttPort);
   client.setCallback(mqtt_callback);
-  // END MQTT Callback
   // END MQTT Setup
 
   // START DHT22 Setup
@@ -165,18 +185,18 @@ void reconnect() {
     if (client.connect("ESPClient")) {
       Serial.println("connected");
       
-      bool sub1 = client.subscribe("/RELAY_1/X1/V1");
-      bool sub2 = client.subscribe("/RELAY_2/X1/V1");
+      bool sub1 = client.subscribe(TOPIC_RELAY_1_X1);
+      bool sub2 = client.subscribe(TOPIC_RELAY_1_X2);
+
+      digitalWrite(LED_PIN_MQTT, HIGH);
 
       Serial.print("Subscribe relay 1: ");
       Serial.println(sub1 ? "OK" : "FAILED");
 
       Serial.print("Subscribe relay 2: ");
       Serial.println(sub2 ? "OK" : "FAILED");
-
-      digitalWrite(LED_PIN_MQTT, HIGH); // LED ON
     } else {
-      digitalWrite(LED_PIN_MQTT, LOW); // LED OFF
+      digitalWrite(LED_PIN_MQTT, LOW);
       Serial.print("failed, rc=");
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds"); 
@@ -196,26 +216,15 @@ void dht22Sensor() {
     Serial.println(F("Failed to read from DHT sensor!"));
     return;
   }
+  
+  publishTopic(TOPIC_TEMPERATURE, String(t, 2));
+  publishTopic(TOPIC_HUMIDITY, String(h, 2));
 
-  unsigned long now = millis();
-  if (now - lastMsg > 2000) {
-    lastMsg = now;
-    
-    // Convert float to String
-    String temperatureStr = String(t, 2);
-    String humidityStr = String(h, 2);
-
-    const char* publishTopicTemperature = "/TEMPERATURE/V1";
-    const char* publishTopicHumidity = "/HUMIDITY/V1";
-    client.publish(publishTopicTemperature, temperatureStr.c_str()); 
-    client.publish(publishTopicHumidity, humidityStr.c_str()); 
-
-    Serial.print(F("Humidity: "));
-    Serial.print(h);
-    Serial.print(F("%  Temperature: "));
-    Serial.print(t);
-    Serial.println(F("°C"));
-  }
+  Serial.print(F("Humidity: "));
+  Serial.print(h);
+  Serial.print(F("%  Temperature: "));
+  Serial.print(t);
+  Serial.println(F("°C"));
 }
 
 void capacitiveSoilSensor() {
@@ -224,10 +233,8 @@ void capacitiveSoilSensor() {
   // Convert raw reading to a percentage (constrained between 0% and 100%)
   int moisturePercent = map(sensorVal, AirValue, WaterValue, 0, 100);
   moisturePercent = constrain(moisturePercent, 0, 100);
-  String moisture = String(moisturePercent);
 
-  const char* publishTopicMoisture = "/MOISTURE/V1";
-  client.publish(publishTopicMoisture, moisture.c_str());
+  publishTopic(TOPIC_MOISTURE, String(moisturePercent));
 
   Serial.print("Raw Value: ");
   Serial.print(sensorVal);
@@ -236,35 +243,33 @@ void capacitiveSoilSensor() {
   Serial.print(" | WaterValue: ");
   Serial.print(WaterValue);
   Serial.print(" | Moisture: ");
-  Serial.print(moisture);
+  Serial.print(moisturePercent);
   Serial.println("%");
 }
 
 void waterLevelSensor() {
-  // START Water Level Sensor
   int waterLevel = analogRead(WATER_SENSOR);
-  String waterLevelStr = String(waterLevel);
 
-  const char* publishTopicWaterLevel = "/WATER_LEVEL/V1";
-  client.publish(publishTopicWaterLevel, waterLevelStr.c_str());
+  if(isnan(waterLevel)) {
+    Serial.println(F("Failed to read from water level sensor!"));
+    return;
+  }
 
+  publishTopic(TOPIC_WATER_LEVEL, String(waterLevel));
   Serial.print("Water Level Value: ");
   Serial.println(waterLevel);
-  // END Water Level Sensor
 }
 
 void lightLevelSensor() {
   // Read light level in lux
   float lux = lightMeter.readLightLevel();
-  String luxLevelStr = String(lux, 2);
-
-  const char* publishTopicLuxLevel = "/LIGHT/V1";
-  client.publish(publishTopicLuxLevel, luxLevelStr.c_str());
 
   // Validate reading
   if (lux < 0) {
     Serial.println("Error reading light level.");
   } else {
+    publishTopic(TOPIC_LIGHT, String(lux, 2));
+
     Serial.print("Light: ");
     Serial.print(lux);
     Serial.println(" lx");
@@ -281,10 +286,7 @@ void tdsMeterSensor() {
                    - 255.86 * voltage * voltage
                    + 857.39 * voltage) * 0.5; // ppm
 
-  String ppmLevelStr = String(tdsValue, 2);
-
-  const char* publishTopicPpmLevel = "/PPM/V1";
-  client.publish(publishTopicPpmLevel, ppmLevelStr.c_str());
+  publishTopic(TOPIC_TDS, String(tdsValue, 2));
 
   Serial.print("Voltage: ");
   Serial.print(voltage, 2);
@@ -301,28 +303,32 @@ void loop() {
   // Process incoming MQTT messages first
   client.loop();
 
-  // START DHT22 Sensor
-  dht22Sensor();
-  // END DHT22 Sensor
+  unsigned long now = millis();
 
-  // START Capacitive Soil Sensor
-  capacitiveSoilSensor();
-  // END Capacitive Soil Sensor
+  if (now - lastSensorRead >= SENSOR_INTERVAL) {
+    lastSensorRead = now;
 
-  // START Water Level Sensor
-  waterLevelSensor();
-  // END Water Level Sensor
+    // START DHT22 Sensor
+    dht22Sensor();
+    // END DHT22 Sensor
 
-  // START Light Level Sensor
-  lightLevelSensor();
-  // END Light Level Sensor
+    // START Capacitive Soil Sensor
+    capacitiveSoilSensor();
+    // END Capacitive Soil Sensor
 
-  // START TDS Meter Sensor
-  tdsMeterSensor();
-  // END TDS Meter Sensor
+    // START Water Level Sensor
+    waterLevelSensor();
+    // END Water Level Sensor
 
-  Serial.println("");
-  // Wait 5 seconds between measurements
-  delay(5000);
+    // START Light Level Sensor
+    lightLevelSensor();
+    // END Light Level Sensor
+
+    // START TDS Meter Sensor
+    tdsMeterSensor();
+    // END TDS Meter Sensor
+
+    Serial.println("");
+  }
 }
 
