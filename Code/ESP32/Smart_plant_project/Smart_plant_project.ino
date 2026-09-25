@@ -67,14 +67,14 @@ float averageAnalogRead() {
 }
 
 // WiFi Connection
-const char* ssid = "wiyan";
-const char* password = "12345678";
+const char* ssid = "Kantin Belakang";
+const char* password = "PemudaTersesat27";
 
 // MQTT Server
 const bool isCloud = false;
 const char* cloudMqttServer = "broker.hivemq.com"; // MQTT cloud broker
 const int cloudMqttPort = 1883; // MQTT cloud port 
-const char* localMqttServer = "10.85.4.61"; // MQTT local broker
+const char* localMqttServer = "192.168.1.50"; // MQTT local broker
 const int localMqttPort = 1883; // MQTT local port
 
 WiFiClient espClient;
@@ -94,6 +94,13 @@ const char* PUB_MOISTURE     = "/smartplant/esp32-01/sensor/moisture";
 const char* PUB_WATER_LEVEL  = "/smartplant/esp32-01/sensor/water-level";
 const char* PUB_LIGHT        = "/smartplant/esp32-01/sensor/light";
 const char* PUB_TDS          = "/smartplant/esp32-01/sensor/ppm";
+
+const char* NOTIF_PUMP       = "/smartplant/esp32-01/notification/pump";
+const char* NOTIF_MIST       = "/smartplant/esp32-01/notification/mist";
+const char* NOTIF_LED        = "/smartplant/esp32-01/notification/led";
+
+const char* AKTIF            = "Aktif";
+const char* MATI             = "Mati";
 
 void publishTopic(const char* topicName, String value){
   if(client.publish(topicName, value.c_str())) {
@@ -205,13 +212,16 @@ void updatePumpState() {
   bool isSoilOver = latestSoilHumidityValue > PUMP_OFF_SOL_MOIST_LEVEL;
 
   if (isWaterLevelInRange && isTdsInRange && isSoilInRange) {
-    digitalWrite(RELAY1_PIN_1, LOW); // Water pump off
+    digitalWrite(RELAY1_PIN_1, HIGH); // Water pump off
+    publishTopic(NOTIF_PUMP, MATI);
     Serial.println("Pump: OFF");
   } else if (isWaterOver || isTdsOver || isSoilOver) {
-    digitalWrite(RELAY1_PIN_1, LOW); // Water pump off
+    digitalWrite(RELAY1_PIN_1, HIGH); // Water pump off
+    publishTopic(NOTIF_PUMP, MATI);
     Serial.println("Pump: OFF");
   } else {
-    digitalWrite(RELAY1_PIN_1, HIGH); // Water pump on
+    digitalWrite(RELAY1_PIN_1, LOW); // Water pump on
+    publishTopic(NOTIF_PUMP, AKTIF);
     Serial.println("Pump: ON");
   }
 }
@@ -230,13 +240,16 @@ void updateLedState() {
   bool isLuxOver = latestLuxValue > LED_OFF_LUX_LEVEL;
 
   if (isTemperatureInRange && isLuxInRange) {
-    digitalWrite(RELAY2_PIN_1, LOW);
+    digitalWrite(RELAY2_PIN_1, HIGH);
+    publishTopic(NOTIF_LED, MATI);
     Serial.println("LED: OFF");
   } else if (isLuxOver || isTemperatureOver){
-    digitalWrite(RELAY2_PIN_1, LOW);
+    digitalWrite(RELAY2_PIN_1, HIGH);
+    publishTopic(NOTIF_LED, MATI);
     Serial.println("LED: OFF");
   } else {
-    digitalWrite(RELAY2_PIN_1, HIGH);
+    digitalWrite(RELAY2_PIN_1, LOW);
+    publishTopic(NOTIF_LED, AKTIF);
     Serial.println("LED: ON");
   }
 }
@@ -334,9 +347,15 @@ void dht22Sensor() {
 
   if (latestAirHumidityValue < MIST_ON_LEVEL) {
       digitalWrite(RELAY1_PIN_2, LOW);
+      publishTopic(NOTIF_MIST, AKTIF);
       Serial.println("Water Mist: ON");
   } else if (latestAirHumidityValue > MIST_OFF_LEVEL) {
       digitalWrite(RELAY1_PIN_2, HIGH);
+      publishTopic(NOTIF_MIST, MATI);
+      Serial.println("Water Mist: OFF");
+  } else {
+      digitalWrite(RELAY1_PIN_2, HIGH);
+      publishTopic(NOTIF_MIST, MATI);
       Serial.println("Water Mist: OFF");
   }
 
@@ -422,7 +441,7 @@ void tdsMeterSensor() {
   Serial.println(" ppm");
 }
 
-const unsigned long SENSOR_INTERVAL = 5000;
+const unsigned long SENSOR_INTERVAL = 2000;
 unsigned long lastSensorRead = 0;
 
 void loop() {
