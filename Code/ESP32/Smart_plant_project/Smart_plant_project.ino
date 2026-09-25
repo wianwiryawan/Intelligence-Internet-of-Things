@@ -11,16 +11,24 @@
 #define LED_PIN_MQTT 2
 
 // 2 Way Module Relay HW-383
-#define RELAY1_PIN_1 12
-#define RELAY1_PIN_2 14
+#define RELAY1_PIN_1 12 // Submersible Water Pump
+#define RELAY1_PIN_2 14 // Water Mist Generator
+#define RELAY2_PIN_1 25 // LED
+#define RELAY2_PIN_2 26 // Solenoid Valve
 
 // DHT Sensor
 #define DHTPIN 4        // Digital pin connected to the DHT sensor
 #define DHTTYPE DHT22   // DHT 22  (AM2302), AM2321
 DHT dht(DHTPIN, DHTTYPE);
+// Range ideal suhu tanaman hias 18 - 27
+const int LED_ON_TEMP_LEVEL = 18;
+const int LED_OFF_TEMP_LEVEL = 27;
+// Range ideal kelembaban tanaman hias 60% - 80%
+const int MIST_ON_LEVEL = 60;
+const int MIST_OFF_LEVEL = 80;
 
 // Capacitive Soil Moisture Sensor
-const int sensorInPin = 35;
+#define SOIL_SENSOR 35
 
 // Calibration values (Update these based on your own sensor testing)
 const int AirValue = 3500;   // Sensor reading in dry air
@@ -28,11 +36,23 @@ const int WaterValue = 1500; // Sensor reading completely submerged in water
 
 // MH Water Sensor (water level)
 #define WATER_SENSOR 34
+// Range ideal tinggi air pada wadah 1000 - 1500 unit
+const int PUMP_ON_LEVEL = 1000;
+const int PUMP_OFF_LEVEL = 1500;
+// Range ideal ppm air pada wadah 50 - 300 ppm
+const int PUMP_ON_PPM_LEVEL = 50;
+const int PUMP_OFF_PPM_LEVEL = 300;
+// Range ideal kelembaban tanah 50% - 70%
+const int PUMP_ON_SOL_MOIST_LEVEL = 50;
+const int PUMP_OFF_SOL_MOIST_LEVEL = 70;
 
 // Light Sensor
 BH1750 lightMeter;
 #define LIGHT_SDA 32
 #define LIGHT_SCL 33
+// Range ideal lux untuk tanaman 2000 - 5000 ppm
+const int LED_ON_LUX_LEVEL = 2000;
+const int LED_OFF_LUX_LEVEL = 5000;
 
 // TDS Sensor v1.0
 #define TdsSensorPin 39  // ADC pin connected to AOUT
@@ -46,31 +66,34 @@ float averageAnalogRead() {
   return sum / (float)SCOUNT;
 }
 
-const char* ssid = "LaptopLitya";
-const char* password = "binusplenger";
+// WiFi Connection
+const char* ssid = "wiyan";
+const char* password = "12345678";
 
 // MQTT Server
 const bool isCloud = false;
 const char* cloudMqttServer = "broker.hivemq.com"; // MQTT cloud broker
 const int cloudMqttPort = 1883; // MQTT cloud port 
-const char* localMqttServer = "192.168.137.60"; // MQTT local broker
+const char* localMqttServer = "10.85.4.61"; // MQTT local broker
 const int localMqttPort = 1883; // MQTT local port
 
 WiFiClient espClient;
 PubSubClient client(espClient);
 
 // MQTT Topics
-const char* TOPIC_RELAY_1_X1   = "/RELAY_1/X1/V1";
-const char* TOPIC_RELAY_1_X2   = "/RELAY_1/X2/V1";
-const char* TOPIC_TEMPERATURE  = "/TEMPERATURE/V1";
-const char* TOPIC_HUMIDITY     = "/HUMIDITY/V1";
-const char* TOPIC_MOISTURE     = "/MOISTURE/V1";
-const char* TOPIC_WATER_LEVEL  = "/WATER_LEVEL/V1";
-const char* TOPIC_LIGHT        = "/LIGHT/V1";
-const char* TOPIC_TDS          = "/PPM/V1";
+// /smartplant/<device>/<category>/<name>
+const char* SUB_MANUAL_CONTROL = "/smartplant/esp32-01/command/flow/manual-control";
+const char* SUB_RELAY_1_1   = "/smartplant/esp32-01/command/relay/1/1"; // Submersible Water Pump
+const char* SUB_RELAY_1_2   = "/smartplant/esp32-01/command/relay/1/2"; // Water Mist Generator
+const char* SUB_RELAY_2_1   = "/smartplant/esp32-01/command/relay/2/1"; // LED
+const char* SUB_RELAY_2_2   = "/smartplant/esp32-01/command/relay/2/2"; // Solenoid Valve
 
-const unsigned long SENSOR_INTERVAL = 5000;
-unsigned long lastSensorRead = 0;
+const char* PUB_TEMPERATURE  = "/smartplant/esp32-01/sensor/temperature";
+const char* PUB_HUMIDITY     = "/smartplant/esp32-01/sensor/humidity";
+const char* PUB_MOISTURE     = "/smartplant/esp32-01/sensor/moisture";
+const char* PUB_WATER_LEVEL  = "/smartplant/esp32-01/sensor/water-level";
+const char* PUB_LIGHT        = "/smartplant/esp32-01/sensor/light";
+const char* PUB_TDS          = "/smartplant/esp32-01/sensor/ppm";
 
 void publishTopic(const char* topicName, String value){
   if(client.publish(topicName, value.c_str())) {
@@ -124,26 +147,133 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
   Serial.print("Message arrived [");
   Serial.print(topic);
   Serial.print("] ");
-
   String string;
   for (int i = 0; i < length; i++) {
      string+=((char)payload[i]);  
   }
-  Serial.print(string);
-  Serial.println("");
+  Serial.println(string);
 
-  if (String(topic) == TOPIC_RELAY_1_X1) {
+  if (String(topic) == SUB_RELAY_1_1) {
     if (string == "1") {
       digitalWrite(RELAY1_PIN_1, LOW);
     } else {
       digitalWrite(RELAY1_PIN_1, HIGH);
     }
-  } else if (String(topic) == TOPIC_RELAY_1_X2) {
+  } else if (String(topic) == SUB_RELAY_1_2) {
     if (string == "1") {
       digitalWrite(RELAY1_PIN_2, LOW);
     } else {
       digitalWrite(RELAY1_PIN_2, HIGH);
     }
+  } else if (String(topic) == SUB_RELAY_2_1) {
+    if (string == "1") {
+      digitalWrite(RELAY2_PIN_1, LOW);
+    } else {
+      digitalWrite(RELAY2_PIN_1, HIGH);
+    } 
+  } else if (String(topic) == SUB_RELAY_2_2) {
+    if (string == "1") {
+      digitalWrite(RELAY2_PIN_2, LOW);
+    } else {
+      digitalWrite(RELAY2_PIN_2, HIGH);
+    }
+  }
+}
+
+int latestWaterLevel = -1;
+float latestTdsValue = -1;
+float latestSoilHumidityValue = -1;
+float latestTemperatureValue = -1;
+float latestAirHumidityValue = -1;
+float latestLuxValue = -1;
+
+void updatePumpState() {
+  if (latestWaterLevel < 0 || latestTdsValue < 0 || latestSoilHumidityValue < 0) {
+    return;
+  }
+
+  bool isWaterLevelInRange = latestWaterLevel > PUMP_ON_LEVEL
+                          && latestWaterLevel < PUMP_OFF_LEVEL;
+  bool isWaterOver = latestWaterLevel > PUMP_OFF_LEVEL;
+
+  bool isTdsInRange = latestTdsValue > PUMP_ON_PPM_LEVEL
+                    && latestTdsValue < PUMP_OFF_PPM_LEVEL;
+  bool isTdsOver = latestTdsValue > PUMP_OFF_PPM_LEVEL;
+
+  bool isSoilInRange = latestSoilHumidityValue > PUMP_ON_SOL_MOIST_LEVEL
+                    && latestSoilHumidityValue < PUMP_OFF_SOL_MOIST_LEVEL;
+  bool isSoilOver = latestSoilHumidityValue > PUMP_OFF_SOL_MOIST_LEVEL;
+
+  if (isWaterLevelInRange && isTdsInRange && isSoilInRange) {
+    digitalWrite(RELAY1_PIN_1, LOW); // Water pump off
+    Serial.println("Pump: OFF");
+  } else if (isWaterOver || isTdsOver || isSoilOver) {
+    digitalWrite(RELAY1_PIN_1, LOW); // Water pump off
+    Serial.println("Pump: OFF");
+  } else {
+    digitalWrite(RELAY1_PIN_1, HIGH); // Water pump on
+    Serial.println("Pump: ON");
+  }
+}
+
+void updateLedState() {
+  if (latestTemperatureValue < 0 || latestLuxValue < 0 ) {
+    return;
+  }
+
+  bool isTemperatureInRange = latestTemperatureValue > LED_ON_TEMP_LEVEL
+                            && latestTemperatureValue < LED_OFF_TEMP_LEVEL;
+  bool isTemperatureOver = latestTemperatureValue > LED_OFF_TEMP_LEVEL;
+
+  bool isLuxInRange = latestLuxValue > LED_ON_LUX_LEVEL
+                    && latestLuxValue < LED_OFF_LUX_LEVEL;
+  bool isLuxOver = latestLuxValue > LED_OFF_LUX_LEVEL;
+
+  if (isTemperatureInRange && isLuxInRange) {
+    digitalWrite(RELAY2_PIN_1, LOW);
+    Serial.println("LED: OFF");
+  } else if (isLuxOver || isTemperatureOver){
+    digitalWrite(RELAY2_PIN_1, LOW);
+    Serial.println("LED: OFF");
+  } else {
+    digitalWrite(RELAY2_PIN_1, HIGH);
+    Serial.println("LED: ON");
+  }
+}
+
+void subscribeTopics() {
+  bool sub1 = client.subscribe(SUB_RELAY_1_1);
+  bool sub2 = client.subscribe(SUB_RELAY_1_2);
+  bool sub3 = client.subscribe(SUB_RELAY_2_1);
+  bool sub4 = client.subscribe(SUB_RELAY_2_2);
+
+  Serial.print("Subscribe relay 1 pin 1: ");
+  Serial.println(sub1 ? "OK" : "FAILED");
+
+  Serial.print("Subscribe relay 1 pin 2: ");
+  Serial.println(sub2 ? "OK" : "FAILED");
+
+  Serial.print("Subscribe relay 2 pin 1: ");
+  Serial.println(sub3 ? "OK" : "FAILED");
+
+  Serial.print("Subscribe relay 2 pin 1: ");
+  Serial.println(sub4 ? "OK" : "FAILED");
+}
+
+void reconnect() {
+  while (!client.connected()) {
+    Serial.print("Attempting MQTT connection...");
+    if (client.connect("ESPClient")) {
+      subscribeTopics();
+      Serial.println("connected");
+      digitalWrite(LED_PIN_MQTT, HIGH);
+    } else {
+      digitalWrite(LED_PIN_MQTT, LOW);
+      Serial.print("failed, rc=");
+      Serial.print(client.state());
+      Serial.println(" try again in 5 seconds"); 
+      delay(5000);
+   }
   }
 }
 
@@ -153,8 +283,15 @@ void setup() {
   pinMode(LED_PIN_WIFI, OUTPUT); // WiFi indicator LED
   pinMode(LED_PIN_MQTT, OUTPUT); // MQTT indicator LED
 
-  pinMode(RELAY1_PIN_1, OUTPUT); // Relay 1 X1
-  pinMode(RELAY1_PIN_2, OUTPUT); // Relay 1 X2
+  pinMode(RELAY1_PIN_1, OUTPUT); // Relay 1 1
+  pinMode(RELAY1_PIN_2, OUTPUT); // Relay 1 2
+  pinMode(RELAY2_PIN_1, OUTPUT); // Relay 2 1
+  pinMode(RELAY2_PIN_2, OUTPUT); // Relay 2 2
+
+  digitalWrite(RELAY1_PIN_1, HIGH); // Pump off; relay is active-low
+  digitalWrite(RELAY1_PIN_2, HIGH); // Water Mist Generator off; relay is active-low
+  digitalWrite(RELAY2_PIN_1, HIGH); // LED off; relay is active-low
+  digitalWrite(RELAY2_PIN_2, HIGH); // Solenoid Valve off; relay is active-low
 
   // START WiFi Setup
   setup_wifi();
@@ -179,37 +316,10 @@ void setup() {
   // START BH1750 Setup
 }
 
-void reconnect() {
-  while (!client.connected()) {
-    Serial.print("Attempting MQTT connection...");
-    if (client.connect("ESPClient")) {
-      Serial.println("connected");
-      
-      bool sub1 = client.subscribe(TOPIC_RELAY_1_X1);
-      bool sub2 = client.subscribe(TOPIC_RELAY_1_X2);
-
-      digitalWrite(LED_PIN_MQTT, HIGH);
-
-      Serial.print("Subscribe relay 1: ");
-      Serial.println(sub1 ? "OK" : "FAILED");
-
-      Serial.print("Subscribe relay 2: ");
-      Serial.println(sub2 ? "OK" : "FAILED");
-    } else {
-      digitalWrite(LED_PIN_MQTT, LOW);
-      Serial.print("failed, rc=");
-      Serial.print(client.state());
-      Serial.println(" try again in 5 seconds"); 
-      delay(5000);
-   }
-  }
-}
-
 void dht22Sensor() {
   // Read humidity and temperature
   float h = dht.readHumidity();
   float t = dht.readTemperature(); // Celsius by default
-  
 
   // Check if readings failed
   if (isnan(h) || isnan(t)) {
@@ -217,24 +327,35 @@ void dht22Sensor() {
     return;
   }
   
-  publishTopic(TOPIC_TEMPERATURE, String(t, 2));
-  publishTopic(TOPIC_HUMIDITY, String(h, 2));
+  latestAirHumidityValue = h;
+  latestTemperatureValue = t;
+  publishTopic(PUB_TEMPERATURE, String(t, 2));
+  publishTopic(PUB_HUMIDITY, String(h, 2));
+
+  if (latestAirHumidityValue < MIST_ON_LEVEL) {
+      digitalWrite(RELAY1_PIN_2, LOW);
+      Serial.println("Water Mist: ON");
+  } else if (latestAirHumidityValue > MIST_OFF_LEVEL) {
+      digitalWrite(RELAY1_PIN_2, HIGH);
+      Serial.println("Water Mist: OFF");
+  }
 
   Serial.print(F("Humidity: "));
   Serial.print(h);
-  Serial.print(F("%  Temperature: "));
+  Serial.print(F("% | Temperature: "));
   Serial.print(t);
   Serial.println(F("°C"));
 }
 
 void capacitiveSoilSensor() {
-  int sensorVal = analogRead(sensorInPin); // Read analog value from ESP32 pin
+  int sensorVal = analogRead(SOIL_SENSOR); // Read analog value from ESP32 pin
   
   // Convert raw reading to a percentage (constrained between 0% and 100%)
   int moisturePercent = map(sensorVal, AirValue, WaterValue, 0, 100);
   moisturePercent = constrain(moisturePercent, 0, 100);
 
-  publishTopic(TOPIC_MOISTURE, String(moisturePercent));
+  latestSoilHumidityValue = moisturePercent;
+  publishTopic(PUB_MOISTURE, String(moisturePercent));
 
   Serial.print("Raw Value: ");
   Serial.print(sensorVal);
@@ -255,7 +376,9 @@ void waterLevelSensor() {
     return;
   }
 
-  publishTopic(TOPIC_WATER_LEVEL, String(waterLevel));
+  latestWaterLevel = waterLevel;
+  publishTopic(PUB_WATER_LEVEL, String(waterLevel));
+
   Serial.print("Water Level Value: ");
   Serial.println(waterLevel);
 }
@@ -268,7 +391,9 @@ void lightLevelSensor() {
   if (lux < 0) {
     Serial.println("Error reading light level.");
   } else {
-    publishTopic(TOPIC_LIGHT, String(lux, 2));
+    latestLuxValue = lux;
+    publishTopic(PUB_LIGHT, String(lux, 2));
+    updateLedState();
 
     Serial.print("Light: ");
     Serial.print(lux);
@@ -286,7 +411,9 @@ void tdsMeterSensor() {
                    - 255.86 * voltage * voltage
                    + 857.39 * voltage) * 0.5; // ppm
 
-  publishTopic(TOPIC_TDS, String(tdsValue, 2));
+  latestTdsValue = tdsValue;
+  publishTopic(PUB_TDS, String(tdsValue, 2));
+  updatePumpState();
 
   Serial.print("Voltage: ");
   Serial.print(voltage, 2);
@@ -294,6 +421,9 @@ void tdsMeterSensor() {
   Serial.print(tdsValue, 0);
   Serial.println(" ppm");
 }
+
+const unsigned long SENSOR_INTERVAL = 5000;
+unsigned long lastSensorRead = 0;
 
 void loop() {
   if (!client.connected()) {
