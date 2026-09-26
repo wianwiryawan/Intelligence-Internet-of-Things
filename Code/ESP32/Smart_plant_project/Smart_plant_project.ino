@@ -70,11 +70,6 @@ float averageAnalogRead() {
   return sum / (float)SCOUNT;
 }
 
-// LED Sripe WS2812B
-// #define PIN_WS2812B 16
-// #define NUM_PIXELS 13
-// Adafruit_NeoPixel ws2812b(NUM_PIXELS, PIN_WS2812B, NEO_GRB + NEO_KHZ800);
-
 // WiFi Connection
 const char* ssid = "Kantin Belakang";
 const char* password = "PemudaTersesat27";
@@ -333,8 +328,6 @@ void setup() {
   digitalWrite(RELAY2_PIN_1, HIGH); // LED off; relay is active-low
   digitalWrite(RELAY2_PIN_2, HIGH); // Solenoid Valve off; relay is active-low
 
-  // ws2812b.begin();  // initialize WS2812B strip object
-
   // START WiFi Setup
   setup_wifi();
   // END WiFi Setup
@@ -371,7 +364,7 @@ void reconnect() {
       Serial.print(client.state());
       Serial.println(" try again in 5 seconds"); 
       delay(5000);
-   }
+    }
   }
 }
 
@@ -534,14 +527,6 @@ void loop() {
     // START TDS Meter Sensor
     tdsMeterSensor();
     // END TDS Meter Sensor
-
-    // static bool ws2812bOn = false;
-    // ws2812bOn = !ws2812bOn;
-    // for (int pixel = 0; pixel < NUM_PIXELS; pixel++) {
-    //   ws2812b.setPixelColor(pixel, ws2812bOn ? ws2812b.Color(0, 255, 0) : 0);
-    //   Serial.println("Test 1");
-    // }
-    // ws2812b.show();
 
     Serial.println("");
   }
