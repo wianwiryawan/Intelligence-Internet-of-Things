@@ -3,7 +3,6 @@
 #include <PubSubClient.h>
 #include <Wire.h>
 #include <BH1750.h>
-#include <Adafruit_NeoPixel.h>
 
 // LED WiFi indicator
 #define LED_PIN_WIFI 0
@@ -14,7 +13,6 @@
 // 2 Way Module Relay HW-383
 #define RELAY1_PIN_1 12 // Submersible Water Pump
 #define RELAY1_PIN_2 14 // Water Mist Generator
-#define RELAY2_PIN_1 25 // LED
 #define RELAY2_PIN_2 26 // Solenoid Valve
 
 // DHT Sensor
@@ -54,9 +52,6 @@ const int PUMP_OFF_SOL_MOIST_LEVEL = 70;
 BH1750 lightMeter;
 #define LIGHT_SDA 32
 #define LIGHT_SCL 33
-// Range ideal lux untuk tanaman 2000 - 5000 ppm
-const int LED_ON_LUX_LEVEL = 2000;
-const int LED_OFF_LUX_LEVEL = 5000;
 
 // TDS Sensor v1.0
 #define TdsSensorPin 39  // ADC pin connected to AOUT
@@ -88,7 +83,6 @@ PubSubClient client(espClient);
 // /smartplant/<device>/<category>/<name>
 const char* SUB_RELAY_1_1   = "/smartplant/esp32-01/command/relay/1/1"; // Submersible Water Pump
 const char* SUB_RELAY_1_2   = "/smartplant/esp32-01/command/relay/1/2"; // Water Mist Generator
-const char* SUB_RELAY_2_1   = "/smartplant/esp32-01/command/relay/2/1"; // LED
 const char* SUB_RELAY_2_2   = "/smartplant/esp32-01/command/relay/2/2"; // Solenoid Valve
 
 const char* PUB_TEMPERATURE  = "/smartplant/esp32-01/sensor/temperature";
@@ -100,7 +94,6 @@ const char* PUB_TDS          = "/smartplant/esp32-01/sensor/ppm";
 
 const char* NOTIF_PUMP       = "/smartplant/esp32-01/notification/pump";
 const char* NOTIF_MIST       = "/smartplant/esp32-01/notification/mist";
-const char* NOTIF_LED        = "/smartplant/esp32-01/notification/led";
 const char* NOTIF_SOLENOID   = "/smartplant/esp32-01/notification/solenoid";
 
 const char* AKTIF            = "Aktif";
@@ -182,14 +175,6 @@ void mqtt_callback(char* topic, byte* payload, unsigned int length) {
       digitalWrite(RELAY1_PIN_2, HIGH);
       publishTopic(NOTIF_MIST, MATI);
     }
-  } else if (String(topic) == SUB_RELAY_2_1) {
-    if (string == "1") {
-      digitalWrite(RELAY2_PIN_1, LOW);
-      publishTopic(NOTIF_LED, AKTIF);
-    } else {
-      digitalWrite(RELAY2_PIN_1, HIGH);
-      publishTopic(NOTIF_LED, MATI);
-    } 
   } else if (String(topic) == SUB_RELAY_2_2) {
     if (string == "1") {
       digitalWrite(RELAY2_PIN_2, LOW);
@@ -206,8 +191,6 @@ float latestTdsValue = -1;
 float latestSoilMoistureValue = -1;
 float latestTemperatureValue = -1;
 float latestAirHumidityValue = -1;
-float latestLuxValue = -1;
-bool solenoidOpen = false;
 
 void updatePumpState() {
   if (latestWaterLevel < 0 || latestTdsValue < 0 || latestSoilMoistureValue < 0) {
@@ -243,61 +226,10 @@ void updatePumpState() {
   }
 }
 
-void updateLedState() {
-  if (latestTemperatureValue < 0 || latestLuxValue < 0 ) {
-    return;
-  }
-
-  bool isTemperatureInRange = latestTemperatureValue >= LED_ON_TEMP_LEVEL
-                            && latestTemperatureValue <= LED_OFF_TEMP_LEVEL;
-  bool isTemperatureOver = latestTemperatureValue >= LED_OFF_TEMP_LEVEL;
-
-  bool isLuxInRange = latestLuxValue >= LED_ON_LUX_LEVEL
-                    && latestLuxValue <= LED_OFF_LUX_LEVEL;
-  bool isLuxOver = latestLuxValue >= LED_OFF_LUX_LEVEL;
-
-  if (isTemperatureInRange && isLuxInRange) {
-    digitalWrite(RELAY2_PIN_1, HIGH);
-    publishTopic(NOTIF_LED, MATI);
-    Serial.println("LED: OFF");
-  } else if (isLuxOver || isTemperatureOver){
-    digitalWrite(RELAY2_PIN_1, HIGH);
-    publishTopic(NOTIF_LED, MATI);
-    Serial.println("LED: OFF");
-  } else {
-    digitalWrite(RELAY2_PIN_1, LOW);
-    publishTopic(NOTIF_LED, AKTIF);
-    Serial.println("LED: ON");
-  }
-}
-
-void updateSolenoidState(int latestWaterLevel) {
-  // CLOSED -> OPEN
-  if (!solenoidOpen && latestWaterLevel <= SOLENOID_ON_WATER_LEVEL) {
-    solenoidOpen = true;
-
-    digitalWrite(RELAY2_PIN_2, LOW); // Relay ON
-    publishTopic(NOTIF_SOLENOID, OPEN);
-
-    Serial.println("Solenoid: OPEN");
-  }
-
-  // OPEN -> CLOSED
-  else if (solenoidOpen && latestWaterLevel >= SOLENOID_OFF_WATER_LEVEL) {
-    solenoidOpen = false;
-
-    digitalWrite(RELAY2_PIN_2, HIGH); // Relay OFF
-    publishTopic(NOTIF_SOLENOID, CLOSE);
-
-    Serial.println("Solenoid: CLOSE");
-  }
-}
-
 void subscribeTopics() {
   bool sub1 = client.subscribe(SUB_RELAY_1_1);
   bool sub2 = client.subscribe(SUB_RELAY_1_2);
-  bool sub3 = client.subscribe(SUB_RELAY_2_1);
-  bool sub4 = client.subscribe(SUB_RELAY_2_2);
+  bool sub3 = client.subscribe(SUB_RELAY_2_2);
 
   Serial.print("Subscribe relay 1 pin 1: ");
   Serial.println(sub1 ? "OK" : "FAILED");
@@ -305,11 +237,8 @@ void subscribeTopics() {
   Serial.print("Subscribe relay 1 pin 2: ");
   Serial.println(sub2 ? "OK" : "FAILED");
 
-  Serial.print("Subscribe relay 2 pin 1: ");
+  Serial.print("Subscribe relay 2 pin 2: ");
   Serial.println(sub3 ? "OK" : "FAILED");
-
-  Serial.print("Subscribe relay 2 pin 1: ");
-  Serial.println(sub4 ? "OK" : "FAILED");
 }
 
 void setup() {
@@ -320,12 +249,10 @@ void setup() {
 
   pinMode(RELAY1_PIN_1, OUTPUT); // Relay 1 1
   pinMode(RELAY1_PIN_2, OUTPUT); // Relay 1 2
-  pinMode(RELAY2_PIN_1, OUTPUT); // Relay 2 1
   pinMode(RELAY2_PIN_2, OUTPUT); // Relay 2 2
 
   digitalWrite(RELAY1_PIN_1, HIGH); // Pump off; relay is active-low
   digitalWrite(RELAY1_PIN_2, HIGH); // Water Mist Generator off; relay is active-low
-  digitalWrite(RELAY2_PIN_1, HIGH); // LED off; relay is active-low
   digitalWrite(RELAY2_PIN_2, HIGH); // Solenoid Valve off; relay is active-low
 
   // START WiFi Setup
@@ -429,11 +356,6 @@ void capacitiveSoilSensor() {
 void waterLevelSensor() {
   int waterLevel = analogRead(WATER_SENSOR);
 
-  if(isnan(waterLevel)) {
-    Serial.println(F("Failed to read from water level sensor!"));
-    return;
-  }
-
   latestWaterLevel = waterLevel;
   publishTopic(PUB_WATER_LEVEL, String(waterLevel));
   Serial.print("Water Level Value: ");
@@ -461,13 +383,11 @@ void lightLevelSensor() {
   if (lux < 0) {
     Serial.println("Error reading light level.");
   } else {
-    latestLuxValue = lux;
     publishTopic(PUB_LIGHT, String(lux, 2));
 
     Serial.print("Light: ");
     Serial.print(lux);
     Serial.println(" lx");
-    updateLedState();
   }
 }
 

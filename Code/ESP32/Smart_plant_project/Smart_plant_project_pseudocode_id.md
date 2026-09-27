@@ -1,150 +1,165 @@
-# Pseudocode untuk Smart Plant Project
+# Pseudocode Smart Plant Project
 
 ## Gambaran Umum
-ESP32 membaca sensor lingkungan, menerbitkan pengukuran dan status aktuator melalui MQTT, menerima perintah MQTT untuk empat relay, serta menjalankan kendali otomatis untuk pompa, generator kabut, relay LED, dan katup solenoid. Sketch saat ini tidak memiliki sakelar mode manual; perintah relay diterima setiap kali topik MQTT terkait diterima.
+
+ESP32 membaca sensor, menerbitkan hasil pembacaan melalui MQTT, dan menerima perintah MQTT untuk tiga relay aktif-low: pompa, generator kabut, dan katup solenoid. Rutinitas sensor mengendalikan relay tersebut secara otomatis.
 
 ---
 
-## 1. Pin dan Ambang Batas
+## 1. Perangkat Keras dan Ambang Batas
 
 ```text
-Indikator WiFi: GPIO 0
-Indikator MQTT: GPIO 2
+Indikator status:
+    WiFi: GPIO 0
+    MQTT: GPIO 2
 
-Keluaran relay (aktif-low):
+Keluaran relay aktif-low:
     Pompa: GPIO 12
     Generator kabut: GPIO 14
-    LED: GPIO 25
     Katup solenoid: GPIO 26
 
 DHT22: GPIO 4
     Kabut ON saat kelembapan <= 60%
-    Kabut OFF saat kelembapan > 60% (termasuk rentang 60%-80%)
-    Ambang suhu untuk kendali LED: 18 dan 27 C
+    Kode juga memeriksa kelembapan >= 80% untuk mematikan kabut
+    Konstanta suhu 18 C dan 27 C tidak digunakan oleh kendali aktif
 
 Sensor kelembapan tanah kapasitif: ADC GPIO 35
-    Kalibrasi udara kering = 2290
-    Kalibrasi terendam air = 355
+    Pembacaan udara kering: 2290
+    Pembacaan terendam penuh: 355
 
 Sensor level air: ADC GPIO 34
-    Rentang air untuk pompa: 1000 sampai 2000 hitungan ADC
-    Ambang buka solenoid: <= 1000
-    Ambang tutup solenoid: >= 1500
+    Rentang level air yang mengizinkan pompa: 1000-2000 hitungan ADC, inklusif
+    Ambang solenoid ON: <= 1000
+    Ambang solenoid OFF: >= 1500
 
-BH1750: SDA GPIO 32, SCL GPIO 33
-    Ambang lux untuk LED: 2000 dan 5000
-
+Sensor cahaya BH1750: SDA GPIO 32, SCL GPIO 33
 Sensor TDS: ADC GPIO 39
-    Referensi ADC = 3.3 V; skala ADC = 4095
-    Ukuran buffer sampel melingkar = 30
+    Referensi tegangan: 3.3 V
+    Skala ADC: 4095
+    Buffer rata-rata: 30 pembacaan
 ```
 
-Topik MQTT menggunakan prefiks `/smartplant/esp32-01/`. Topik sensor adalah `sensor/temperature`, `sensor/humidity`, `sensor/moisture`, `sensor/water-level`, `sensor/light`, dan `sensor/ppm`. Topik perintah relay adalah `command/relay/1/1` sampai `command/relay/2/2`. Topik status adalah `notification/pump`, `notification/mist`, `notification/led`, dan `notification/solenoid`.
+Topik MQTT memakai prefiks `/smartplant/esp32-01/`. Topik perintah relay yang dilanggan adalah `/command/relay/1/1` (pompa), `/command/relay/1/2` (kabut), dan `/command/relay/2/2` (solenoid). Pembacaan sensor diterbitkan ke `/sensor/temperature`, `/sensor/humidity`, `/sensor/moisture`, `/sensor/water-level`, `/sensor/light`, dan `/sensor/ppm`. Status relay diterbitkan ke `/notification/pump`, `/notification/mist`, dan `/notification/solenoid`.
 
 ---
 
-## 2. Setup
+## 2. Startup dan Koneksi MQTT
 
 ```text
-MULAI komunikasi serial
-Atur pin indikator dan relay sebagai OUTPUT
+Inisialisasi komunikasi serial
+Atur indikator WiFi/MQTT dan tiga pin relay sebagai OUTPUT
 Atur semua relay aktif-low ke HIGH (OFF)
 Hubungkan ke WiFi dan tunggu sampai tersambung
-Atur broker MQTT dan callback
+Pilih broker MQTT cloud atau lokal sesuai konfigurasi
+Atur server dan callback MQTT
 Inisialisasi DHT22
 Atur pin sensor level air sebagai INPUT
 Inisialisasi I2C dan BH1750
-    Jika inisialisasi BH1750 gagal, cetak error lalu tunggu tanpa batas
-SELESAI setup
-```
+    Jika inisialisasi BH1750 gagal, cetak error dan tunggu tanpa batas
 
-Indikator MQTT menjadi HIGH setelah koneksi broker berhasil dan LOW setelah percobaan koneksi gagal. Setup WiFi menunggu tanpa batas sampai WiFi tersambung.
-
----
-
-## 3. Koneksi dan Perintah MQTT
-
-```text
-FUNGSI reconnectToMQTT()
+FUNGSI reconnect()
     SELAMA MQTT terputus
-        Coba hubungkan ke broker yang dikonfigurasi
-        JIKA tersambung
-            Langganan ke keempat topik perintah relay
+        Coba hubungkan ke broker
+        JIKA koneksi berhasil
+            Langganan ke tiga topik perintah relay
             Atur indikator MQTT ke HIGH
         LAINNYA
             Atur indikator MQTT ke LOW
-            Tunggu 5 detik
+            Cetak status koneksi dan tunggu 5 detik
         ENDIF
     ENDWHILE
 END FUNGSI
-
-FUNGSI onMqttMessage(topic, payload)
-    Ubah byte payload menjadi teks lalu cetak topik dan pesan
-
-    Untuk relay yang sesuai dengan topik:
-        JIKA payload == "1"
-            Atur pin relay ke LOW (ON)
-            Terbitkan status ON yang sesuai
-        LAINNYA
-            Atur pin relay ke HIGH (OFF)
-            Terbitkan status OFF yang sesuai
-        ENDIF
-END FUNGSI
 ```
 
-Perintah relay MQTT tidak dibatasi oleh mode otomatis/manual. Logika sensor otomatis dapat mengubah kembali status relay pompa, kabut, atau LED.
+Setup WiFi menunggu tanpa batas sampai WiFi tersambung. Koneksi ulang MQTT memblokir program dalam pengulangan sampai koneksi berhasil.
 
 ---
 
-## 4. Pembacaan Sensor
+## 3. Handler Perintah Relay MQTT
 
 ```text
-FUNGSI readDhtSensor()
-    Baca kelembapan dan suhu
+FUNGSI mqtt_callback(topic, payload)
+    Ubah byte payload menjadi teks
+    Cetak topik dan payload yang diterima
+    Cocokkan topik dengan relay pompa, kabut, atau solenoid
+
+    JIKA payload == "1"
+        Atur GPIO relay terkait ke LOW (ON)
+        Terbitkan status ON yang sesuai
+    LAINNYA
+        Atur GPIO relay terkait ke HIGH (OFF)
+        Terbitkan status OFF yang sesuai
+    ENDIF
+END FUNGSI
+```
+
+Payload selain tepat `"1"` akan mematikan relay yang dipilih. Perintah tidak memeriksa mode manual/otomatis. Logika sensor dapat mengubah status relay setelahnya.
+
+---
+
+## 4. Rutinitas Pembacaan Sensor
+
+```text
+FUNGSI dht22Sensor()
+    Baca kelembapan dan suhu dari DHT22
     JIKA salah satu pembacaan tidak valid
         Cetak error lalu kembali
     ENDIF
     Simpan kelembapan dan suhu terbaru
     Terbitkan suhu dan kelembapan
+    Cetak kedua nilai
 
     JIKA kelembapan <= 60%
         Nyalakan relay kabut; terbitkan "Aktif"
+    ELSE IF kelembapan >= 80%
+        Matikan relay kabut; terbitkan "Mati"
     LAINNYA
         Matikan relay kabut; terbitkan "Mati"
     ENDIF
 END FUNGSI
+```
 
-FUNGSI readSoilMoistureSensor()
-    Baca nilai ADC dari GPIO 35
-    Petakan kalibrasi udara kering 2290 ke 0%, terendam air 355 ke 100%
-    Batasi hasil ke 0%-100%
-    Simpan dan terbitkan persentase kelembapan tanah
+Perilaku efektif kabut: ON pada kelembapan <= 60%, OFF di atas 60%. Kondisi 80% tidak membentuk histeresis karena cabang terakhir juga mematikan kabut.
+
+```text
+FUNGSI capacitiveSoilSensor()
+    Baca nilai ADC GPIO 35
+    Petakan kalibrasi udara kering 2290 ke 0% dan terendam 355 ke 100%
+    Batasi persentase kelembapan ke 0%-100%
+    Simpan dan terbitkan persentase
+    Cetak pembacaan mentah dan persentase hasil konversi
 END FUNGSI
 
-FUNGSI readWaterLevelSensor()
-    Baca hitungan ADC dari GPIO 34
+FUNGSI waterLevelSensor()
+    Baca hitungan ADC GPIO 34
     Simpan dan terbitkan hitungan mentah
+    Cetak nilai level air
+
     JIKA level air <= 1000
         Nyalakan relay solenoid; terbitkan "Open"
+    ELSE IF level air >= 1500
+        Matikan relay solenoid; terbitkan "Close"
     LAINNYA
         Matikan relay solenoid; terbitkan "Close"
     ENDIF
 END FUNGSI
 
-FUNGSI readLightSensor()
+FUNGSI lightLevelSensor()
     Baca lux dari BH1750
-    JIKA lux tidak valid
+    JIKA lux < 0
         Cetak error
     LAINNYA
-        Simpan dan terbitkan lux
-        PANGGIL updateLedState()
+        Terbitkan dan cetak lux
     ENDIF
 END FUNGSI
 
-FUNGSI readTdsSensor()
-    Tambahkan satu pembacaan ADC ke buffer melingkar 30 elemen
-    Rata-ratakan buffer, ubah rata-rata ADC menjadi tegangan, lalu hitung TDS ppm
+FUNGSI tdsMeterSensor()
+    Baca ADC GPIO 39 ke slot berikutnya pada buffer melingkar 30 entri
+    Rata-ratakan semua entri buffer
+    tegangan = rata-rata * (3.3 / 4095)
+    tds = (133.42 * tegangan^3 - 255.86 * tegangan^2 + 857.39 * tegangan) * 0.5
     Simpan dan terbitkan TDS
+    Cetak tegangan dan TDS
     PANGGIL updatePumpState()
 END FUNGSI
 ```
@@ -155,8 +170,8 @@ END FUNGSI
 
 ```text
 FUNGSI updatePumpState()
-    JIKA level air, TDS, atau kelembapan tanah kurang dari 0
-        KEMBALI
+    JIKA level air < 0 ATAU TDS < 0 ATAU kelembapan tanah < 0
+        Kembali tanpa mengubah status pompa
     ENDIF
 
     waterLevelInRange = (1000 <= level air <= 2000)
@@ -176,65 +191,32 @@ FUNGSI updatePumpState()
 END FUNGSI
 ```
 
-Karena `soilInRange` ATAU `soilOver` mencakup semua nilai mulai dari 50%, aturan tanah yang efektif adalah: pompa ON di bawah 50%, OFF pada atau di atas 50%. Level air dan TDS juga harus berada dalam rentang inklusifnya. Fungsi ini dipanggil setelah setiap pembaruan TDS.
+Gabungan kondisi tanah berarti pompa ON di bawah kelembapan 50%, dan OFF pada atau di atas 50%, jika level air dan TDS juga berada dalam rentang inklusif. Fungsi dijalankan setelah setiap pembacaan TDS.
 
 ---
 
-## 6. Kendali Otomatis LED
+## 6. Loop Utama
 
 ```text
-FUNGSI updateLedState()
-    JIKA suhu atau lux kurang dari 0
-        KEMBALI
-    ENDIF
-
-    temperatureInRange = (18 <= suhu <= 27)
-    temperatureOver = (suhu >= 27)
-    luxInRange = (2000 <= lux <= 5000)
-    luxOver = (lux >= 5000)
-
-    JIKA temperatureInRange DAN luxInRange
-        Matikan relay LED; terbitkan "Mati"
-    ELSE IF luxOver ATAU temperatureOver
-        Matikan relay LED; terbitkan "Mati"
-    LAINNYA
-        Nyalakan relay LED; terbitkan "Aktif"
-    ENDIF
-END FUNGSI
-```
-
-Fungsi ini dipanggil setelah pembacaan BH1750 yang valid. Suhu diperbarui lebih awal dalam siklus sensor yang sama.
-
----
-
-## 7. Loop Utama
-
-```text
-intervalPembacaanSensor = 2000 ms
+intervalSensor = 2000 ms
 lastSensorRead = 0
 
 ULANGI TERUS
     JIKA MQTT terputus
-        Hubungkan ulang ke MQTT
+        Panggil reconnect()
     ENDIF
     Proses pesan MQTT yang masuk
 
-    JIKA waktu sekarang - lastSensorRead >= intervalPembacaanSensor
-        Perbarui lastSensorRead
-        Baca DHT22
+    JIKA waktu sekarang - lastSensorRead >= intervalSensor
+        Atur lastSensorRead = waktu sekarang
+        Baca DHT22 dan kendalikan relay kabut
         Baca kelembapan tanah
-        Baca level air dan kendalikan solenoid
-        Baca cahaya dan kendalikan LED
-        Baca TDS dan kendalikan pompa
+        Baca level air dan kendalikan relay solenoid
+        Baca cahaya dan terbitkan lux
+        Baca TDS dan perbarui status pompa
         Cetak baris kosong
     ENDIF
 SELESAI ULANGAN
 ```
 
 ---
-
-## 8. Catatan Perilaku Saat Ini
-
-- Tidak ada setup atau pembaruan WS2812B yang aktif dalam sketch saat ini.
-- Fungsi `updateSolenoidState()` terpisah telah didefinisikan, tetapi pembacaan sensor mengendalikan solenoid secara langsung; fungsi tersebut tidak dipanggil.
-- Perintah relay MQTT dapat diterima dalam mode apa pun. Sketch saat ini tidak memiliki topik atau flag mode manual.
