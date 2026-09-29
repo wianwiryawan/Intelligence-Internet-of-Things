@@ -1407,7 +1407,7 @@
         "type": "ui-group",
         "name": "Tanah",
         "page": "de304870d854a21c",
-        "width": "3",
+        "width": "6",
         "height": 1,
         "order": 4,
         "showTitle": true,
@@ -1534,7 +1534,7 @@
         }
     },
     {
-        "id": "1e0b578d6a3ff353",
+        "id": "3998a9e158cd3c1f",
         "type": "global-config",
         "env": [],
         "modules": {
