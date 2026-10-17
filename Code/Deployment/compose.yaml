@@ -14,6 +14,31 @@ services:
 
     networks:
       - iot-network
+  
+  node-red:
+    image: nodered/node-red:latest
+    container_name: mynodered
+    restart: unless-stopped
+
+    ports:
+      - "1880:1880"
+
+    environment:
+      TZ: Asia/Jakarta
+      FLOWS: flows.json
+
+    volumes:
+      - node_red_data:/data
+
+    depends_on:
+      - hivemq
+
+    networks:
+      - iot-network
+
+volumes:
+  node_red_data:
+    external: true
 
 networks:
   iot-network:
