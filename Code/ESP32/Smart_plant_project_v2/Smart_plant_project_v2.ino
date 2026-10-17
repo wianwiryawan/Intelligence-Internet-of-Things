@@ -86,11 +86,6 @@ WiFiClient espClient;
 PubSubClient client(espClient);
 
 // MQTT Topics
-const char* SUB_RELAY_1_1    = "/smartplant/esp32-01/command/relay/1/1"; // Submersible Water Pump
-const char* SUB_RELAY_1_2    = "/smartplant/esp32-01/command/relay/1/2"; // Water Mist Generator
-const char* SUB_RELAY_2_1    = "/smartplant/esp32-01/command/relay/2/1"; // LED
-const char* SUB_RELAY_2_2    = "/smartplant/esp32-01/command/relay/2/2"; // Kipas
-
 const char* PUB_TEMPERATURE  = "/smartplant/esp32-01/sensor/temperature";
 const char* PUB_HUMIDITY     = "/smartplant/esp32-01/sensor/humidity";
 const char* PUB_MOISTURE     = "/smartplant/esp32-01/sensor/moisture";
@@ -151,43 +146,6 @@ void setup_light_sensor() {
   } else {
     Serial.println("Error initializing BH1750. Check wiring!");
     while (true) delay(100);
-  }
-}
-
-void mqtt_callback(char* topic, byte* payload, unsigned int length) {
-  Serial.print("Message arrived [");
-  Serial.print(topic);
-  Serial.print("] ");
-  String string;
-  for (int i = 0; i < length; i++) {
-    string+=((char)payload[i]);  
-  }
-  Serial.println(string);
-
-  if (String(topic) == SUB_RELAY_1_1) { // Water Pump
-    if (string == "1") {
-      digitalWrite(RELAY1_PIN_1, LOW);
-    } else {
-      digitalWrite(RELAY1_PIN_1, HIGH);
-    }
-  } else if (String(topic) == SUB_RELAY_1_2) { // Water mist
-    if (string == "1") {
-      digitalWrite(RELAY1_PIN_2, LOW);
-    } else {
-      digitalWrite(RELAY1_PIN_2, HIGH);
-    }
-  } else if (String(topic) == SUB_RELAY_2_1) { // LED
-    if (string == "1") {
-      digitalWrite(RELAY2_PIN_1, LOW);
-    } else {
-      digitalWrite(RELAY2_PIN_1, HIGH);
-    }
-  } else if (String(topic) == SUB_RELAY_2_2) { // Kipas
-    if (string == "1") {
-      digitalWrite(RELAY2_PIN_2, LOW);
-    } else {
-      digitalWrite(RELAY2_PIN_2, HIGH);
-    }
   }
 }
 
@@ -342,25 +300,6 @@ void publishActuatorStates() {
   publishTopic(NOTIF_FAN, isFanOn ? ON : OFF);
 }
 
-void subscribeTopics() {
-  bool sub1 = client.subscribe(SUB_RELAY_1_1); // Water Pump
-  bool sub2 = client.subscribe(SUB_RELAY_1_2); // Water Mist
-  bool sub3 = client.subscribe(SUB_RELAY_2_1); // LED
-  bool sub4 = client.subscribe(SUB_RELAY_2_2); // Kipas
-
-  Serial.print("Subscribe relay 1 pin 1: ");
-  Serial.println(sub1 ? "OK" : "FAILED");
-
-  Serial.print("Subscribe relay 1 pin 2: ");
-  Serial.println(sub2 ? "OK" : "FAILED");
-
-  Serial.print("Subscribe relay 2 pin 1: ");
-  Serial.println(sub3 ? "OK" : "FAILED");
-
-  Serial.print("Subscribe relay 2 pin 2: ");
-  Serial.println(sub4 ? "OK" : "FAILED");
-}
-
 void setup() {
   Serial.begin(9600);
 
@@ -386,7 +325,6 @@ void setup() {
   const int mqttPort = isCloud ? cloudMqttPort : localMqttPort;
   
   client.setServer(mqttServer, mqttPort);
-  client.setCallback(mqtt_callback);
   // END MQTT Setup
 
   dht.begin();
@@ -397,7 +335,6 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("ESPClient")) {
-      subscribeTopics();
       publishActuatorStates();
       Serial.println("connected");
       digitalWrite(LED_PIN_MQTT, HIGH);
