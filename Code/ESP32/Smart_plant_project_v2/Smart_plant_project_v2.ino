@@ -18,8 +18,8 @@ DHT dht(DHTPIN, DHTTYPE);
 // 2 Way Module Relay HW-383
 #define RELAY1_PIN_1 12 // Submersible Water Pump
 #define RELAY1_PIN_2 14 // Water Mist Generator
-#define RELAY2_PIN_1 26 // LED Stripe
-#define RELAY2_PIN_2 27 // Kipas
+#define RELAY2_PIN_1 25 // LED Stripe
+#define RELAY2_PIN_2 26 // Kipas
 
 // Light Sensor
 BH1750 lightMeter;
@@ -66,7 +66,10 @@ const int SOIL_MOIST_THRESHOLD = 60;
 const int LUX_THRESHOLD = 500;
 
 // Actuator stays ON only for this long (ms) each time it is triggered
-const unsigned long PULSE_DURATION = 500;
+const unsigned int PULSE_DURATION = 500; // 0.5 detik
+
+const unsigned long STATE_NOTIF_INTERVAL = 300000; // 5 menit
+unsigned long lastStateNotif = 0;
 
 // WiFi Connection
 const char* ssid = "Kantin Belakang";
@@ -76,7 +79,7 @@ const char* password = "PemudaTersesat27";
 const bool isCloud = false;
 const char* cloudMqttServer = "broker.hivemq.com"; // MQTT cloud broker
 const int cloudMqttPort = 1883; // MQTT cloud port 
-const char* localMqttServer = "192.168.1.50"; // MQTT local broker
+const char* localMqttServer = "192.168.1.29"; // MQTT local broker
 const int localMqttPort = 1883; // MQTT local port
 
 WiFiClient espClient;
@@ -222,12 +225,16 @@ void updatePumpState() {
     isPumpPulseActive = true;
     pumpPulseStart = millis();
     publishTopic(NOTIF_PUMP, ON);
-    Serial.println("Pump: ON");
   } else if (!isPumpAllowed && isPumpPulseActive) {
     digitalWrite(RELAY1_PIN_1, HIGH); // Water pump off (conditions no longer safe)
     isPumpPulseActive = false;
     publishTopic(NOTIF_PUMP, OFF);
-    Serial.println("Pump: OFF");
+  }
+
+  if (isPumpPulseActive) {
+    Serial.println("Water Pump: ON");
+  } else {
+    Serial.println("Water Pump: OFF");
   }
 }
 
@@ -246,11 +253,15 @@ void updateMistState() {
     isMistPulseActive = true;
     mistPulseStart = millis();
     publishTopic(NOTIF_MIST, ON);
-    Serial.println("Water Mist: ON");
   } else if (!isMistAllowed && isMistPulseActive) {
     digitalWrite(RELAY1_PIN_2, HIGH); // Water mist off (conditions no longer safe)
     isMistPulseActive = false;
     publishTopic(NOTIF_MIST, OFF);
+  }
+
+  if (isMistPulseActive) {
+    Serial.println("Water Mist: ON");
+  } else {
     Serial.println("Water Mist: OFF");
   }
 }
@@ -268,11 +279,15 @@ void updateLedState() {
     isLedPulseActive = true;
     ledPulseStart = millis();
     publishTopic(NOTIF_LED, ON);
-    Serial.println("LED: ON");
   } else if (!isLedAllowed && isLedPulseActive) {
     digitalWrite(RELAY2_PIN_1, HIGH); // LED off (conditions no longer met)
     isLedPulseActive = false;
     publishTopic(NOTIF_LED, OFF);
+  }
+
+  if (isLedPulseActive) {
+    Serial.println("LED: ON");
+  } else {
     Serial.println("LED: OFF");
   }
 }
@@ -290,11 +305,15 @@ void updateFanState() {
     isFanPulseActive = true;
     fanPulseStart = millis();
     publishTopic(NOTIF_FAN, ON);
-    Serial.println("FAN: ON");
   } else if (!isFanAllowed && isFanPulseActive) {
     digitalWrite(RELAY2_PIN_2, HIGH); // Fan off (conditions no longer met)
     isFanPulseActive = false;
     publishTopic(NOTIF_FAN, OFF);
+  }
+
+  if (isFanPulseActive) {
+    Serial.println("FAN: ON");
+  } else {
     Serial.println("FAN: OFF");
   }
 }
@@ -307,29 +326,20 @@ void checkPulseTimers() {
     digitalWrite(RELAY1_PIN_1, HIGH); // Water pump off
     isPumpPulseActive = false;
     publishTopic(NOTIF_PUMP, OFF);
-    Serial.println("Pump: OFF");
   }
+}
 
-  // if (isMistPulseActive && now - mistPulseStart >= PULSE_DURATION) {
-  //   digitalWrite(RELAY1_PIN_2, HIGH); // Water mist off
-  //   isMistPulseActive = false;
-  //   publishTopic(NOTIF_MIST, OFF);
-  //   Serial.println("Water Mist: OFF");
-  // }
+// Publish topic untuk kondisi aktuator
+void publishActuatorStates() {
+  bool isPumpOn = digitalRead(RELAY1_PIN_1) == LOW;
+  bool isMistOn = digitalRead(RELAY1_PIN_2) == LOW;
+  bool isLedOn = digitalRead(RELAY2_PIN_1) == LOW;
+  bool isFanOn = digitalRead(RELAY2_PIN_2) == LOW;
 
-  // if (isLedPulseActive && now - ledPulseStart >= PULSE_DURATION) {
-  //   digitalWrite(RELAY2_PIN_1, HIGH); // LED off
-  //   isLedPulseActive = false;
-  //   publishTopic(NOTIF_LED, OFF);
-  //   Serial.println("LED: OFF");
-  // }
-
-  // if (isFanPulseActive && now - fanPulseStart >= PULSE_DURATION) {
-  //   digitalWrite(RELAY2_PIN_2, HIGH); // Fan off
-  //   isFanPulseActive = false;
-  //   publishTopic(NOTIF_FAN, OFF);
-  //   Serial.println("FAN: OFF");
-  // }
+  publishTopic(NOTIF_PUMP, isPumpOn ? ON : OFF);
+  publishTopic(NOTIF_MIST, isMistOn ? ON : OFF);
+  publishTopic(NOTIF_LED, isLedOn ? ON : OFF);
+  publishTopic(NOTIF_FAN, isFanOn ? ON : OFF);
 }
 
 void subscribeTopics() {
@@ -388,6 +398,7 @@ void reconnect() {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("ESPClient")) {
       subscribeTopics();
+      publishActuatorStates();
       Serial.println("connected");
       digitalWrite(LED_PIN_MQTT, HIGH);
     } else {
@@ -461,6 +472,7 @@ void lightLevelSensor() {
   if (lux < 0) {
     Serial.println("Error reading light level.");
   } else {
+    latestLuxValue = lux;
     publishTopic(PUB_LIGHT, String(lux, 2));
 
     // Serial.print("Light: ");
@@ -489,7 +501,7 @@ void tdsMeterSensor() {
   // Serial.println(" ppm");
 }
 
-const unsigned long SENSOR_INTERVAL = 2000;
+const unsigned long SENSOR_INTERVAL = 5000;
 unsigned long lastSensorRead = 0;
 
 void loop() {
@@ -518,5 +530,11 @@ void loop() {
     updateLedState();
     updateFanState();
     Serial.println("");
+  }
+
+  // Send actuator state every 5 minutes
+  if (now - lastStateNotif >= STATE_NOTIF_INTERVAL) {
+    lastStateNotif = now;
+    publishActuatorStates();
   }
 }
