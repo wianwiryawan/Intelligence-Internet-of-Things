@@ -77,7 +77,7 @@
         "type": "debug",
         "z": "a7fd0d8f86ef3876",
         "name": "Temperature debug",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -390,7 +390,7 @@
         "type": "debug",
         "z": "a7fd0d8f86ef3876",
         "name": "debug 3",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -425,7 +425,7 @@
         "type": "debug",
         "z": "a7fd0d8f86ef3876",
         "name": "debug 4",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -460,7 +460,7 @@
         "type": "debug",
         "z": "a7fd0d8f86ef3876",
         "name": "debug 5",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -514,7 +514,7 @@
         "type": "debug",
         "z": "a7fd0d8f86ef3876",
         "name": "debug 6",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -561,8 +561,8 @@
         "y": 1900,
         "wires": [
             [
-                "be98be4441a1ccf6",
-                "92bf32990a397242"
+                "92bf32990a397242",
+                "554edac9f72a17bb"
             ]
         ]
     },
@@ -583,8 +583,8 @@
         "y": 2020,
         "wires": [
             [
-                "a7cc98c362aa4de5",
-                "53bb278d638dc387"
+                "53bb278d638dc387",
+                "0b5f348077ca6e74"
             ]
         ]
     },
@@ -605,8 +605,8 @@
         "y": 2140,
         "wires": [
             [
-                "4e1764fcf9bad809",
-                "45a5337dda0c2b27"
+                "45a5337dda0c2b27",
+                "4c613eb96b1a90d7"
             ]
         ]
     },
@@ -627,8 +627,8 @@
         "y": 2260,
         "wires": [
             [
-                "5c52285ba2cc1a98",
-                "738cb1299d0217ff"
+                "738cb1299d0217ff",
+                "7bc6212cc4f0cab0"
             ]
         ]
     },
@@ -939,7 +939,7 @@
         "order": 1,
         "width": 0,
         "height": 0,
-        "name": "Submersible Water Pump",
+        "name": "Water Pump",
         "label": "Submersible Water Pump",
         "format": "{{msg.payload}}",
         "layout": "col-center",
@@ -975,7 +975,7 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 830,
+        "x": 870,
         "y": 2080,
         "wires": []
     },
@@ -1011,8 +1011,8 @@
         "order": 4,
         "width": 0,
         "height": 0,
-        "name": "Solenoid Valve",
-        "label": "Solenoid Valve",
+        "name": "Fan",
+        "label": "Fan",
         "format": "{{msg.payload}}",
         "layout": "col-center",
         "style": false,
@@ -1023,7 +1023,7 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 840,
+        "x": 810,
         "y": 2320,
         "wires": []
     },
@@ -1360,7 +1360,9 @@
         "x": 880,
         "y": 1900,
         "wires": [
-            []
+            [
+                "0a0763d3e8a5e48b"
+            ]
         ]
     },
     {
@@ -1378,7 +1380,9 @@
         "x": 880,
         "y": 2020,
         "wires": [
-            []
+            [
+                "e5aecd422c98807d"
+            ]
         ]
     },
     {
@@ -1396,7 +1400,9 @@
         "x": 880,
         "y": 2140,
         "wires": [
-            []
+            [
+                "8f1669440637336c"
+            ]
         ]
     },
     {
@@ -1414,8 +1420,234 @@
         "x": 880,
         "y": 2260,
         "wires": [
-            []
+            [
+                "4bc0e92587ccf0b9"
+            ]
         ]
+    },
+    {
+        "id": "554edac9f72a17bb",
+        "type": "change",
+        "z": "a7fd0d8f86ef3876",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "1",
+                "fromt": "num",
+                "to": "On",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "0",
+                "fromt": "num",
+                "to": "Off",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 1960,
+        "wires": [
+            [
+                "be98be4441a1ccf6"
+            ]
+        ]
+    },
+    {
+        "id": "0b5f348077ca6e74",
+        "type": "change",
+        "z": "a7fd0d8f86ef3876",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "1",
+                "fromt": "num",
+                "to": "On",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "0",
+                "fromt": "num",
+                "to": "Off",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 2080,
+        "wires": [
+            [
+                "a7cc98c362aa4de5"
+            ]
+        ]
+    },
+    {
+        "id": "4c613eb96b1a90d7",
+        "type": "change",
+        "z": "a7fd0d8f86ef3876",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "1",
+                "fromt": "num",
+                "to": "On",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "0",
+                "fromt": "num",
+                "to": "Off",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 2200,
+        "wires": [
+            [
+                "4e1764fcf9bad809"
+            ]
+        ]
+    },
+    {
+        "id": "7bc6212cc4f0cab0",
+        "type": "change",
+        "z": "a7fd0d8f86ef3876",
+        "name": "",
+        "rules": [
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "1",
+                "fromt": "num",
+                "to": "On",
+                "tot": "str"
+            },
+            {
+                "t": "change",
+                "p": "payload",
+                "pt": "msg",
+                "from": "0",
+                "fromt": "num",
+                "to": "Off",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 640,
+        "y": 2320,
+        "wires": [
+            [
+                "5c52285ba2cc1a98"
+            ]
+        ]
+    },
+    {
+        "id": "0a0763d3e8a5e48b",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "c53397d839012cf0",
+        "name": "Pump state Insert Into Student.SmartPlantIoT",
+        "measurement": "pump_state",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "Student",
+        "bucket": "SmartPlantIoT",
+        "x": 1250,
+        "y": 1900,
+        "wires": []
+    },
+    {
+        "id": "e5aecd422c98807d",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "c53397d839012cf0",
+        "name": "Mist state Insert Into Student.SmartPlantIoT",
+        "measurement": "mist_state",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "Student",
+        "bucket": "SmartPlantIoT",
+        "x": 1250,
+        "y": 2020,
+        "wires": []
+    },
+    {
+        "id": "8f1669440637336c",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "c53397d839012cf0",
+        "name": "LED state Insert Into Student.SmartPlantIoT",
+        "measurement": "led_state",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "Student",
+        "bucket": "SmartPlantIoT",
+        "x": 1250,
+        "y": 2140,
+        "wires": []
+    },
+    {
+        "id": "4bc0e92587ccf0b9",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "c53397d839012cf0",
+        "name": "Fan state Insert Into Student.SmartPlantIoT",
+        "measurement": "fan_state",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "Student",
+        "bucket": "SmartPlantIoT",
+        "x": 1250,
+        "y": 2260,
+        "wires": []
     },
     {
         "id": "323cb69482501dbf",
@@ -1609,7 +1841,7 @@
         }
     },
     {
-        "id": "dc6599f7e03ff8b7",
+        "id": "1242ce6e8c2b9f65",
         "type": "global-config",
         "env": [],
         "modules": {
