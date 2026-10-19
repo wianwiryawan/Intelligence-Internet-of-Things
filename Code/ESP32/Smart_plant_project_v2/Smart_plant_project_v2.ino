@@ -92,6 +92,7 @@ const char* PUB_MOISTURE     = "/smartplant/esp32-01/sensor/moisture";
 const char* PUB_WATER_LEVEL  = "/smartplant/esp32-01/sensor/water-level";
 const char* PUB_LIGHT        = "/smartplant/esp32-01/sensor/light";
 const char* PUB_TDS          = "/smartplant/esp32-01/sensor/ppm";
+const char* PUB_SNAPSHOT     = "/smartplant/esp32-01/data";
 
 const char* NOTIF_PUMP       = "/smartplant/esp32-01/notification/pump";
 const char* NOTIF_MIST       = "/smartplant/esp32-01/notification/mist";
@@ -112,6 +113,60 @@ void publishTopic(const char* topicName, String value){
     Serial.print(topicName);
     Serial.println("]");
   };
+}
+
+void publishSnapshot() {
+  bool pumpOn = digitalRead(RELAY1_PIN_1) == LOW;
+  bool mistOn = digitalRead(RELAY1_PIN_2) == LOW;
+  bool ledOn  = digitalRead(RELAY2_PIN_1) == LOW;
+  bool fanOn  = digitalRead(RELAY2_PIN_2) == LOW;
+
+  String payload = "{";
+
+  payload += "\"device\":\"esp32-01\",";
+
+  payload += "\"temperature\":";
+  payload += String(latestTemperatureValue, 2);
+  payload += ",";
+
+  payload += "\"humidity\":";
+  payload += String(latestAirHumidityValue, 2);
+  payload += ",";
+
+  payload += "\"moisture\":";
+  payload += String(latestSoilMoistureValue, 2);
+  payload += ",";
+
+  payload += "\"water_level\":";
+  payload += String(latestWaterLevel);
+  payload += ",";
+
+  payload += "\"light\":";
+  payload += String(latestLuxValue, 2);
+  payload += ",";
+
+  payload += "\"tds\":";
+  payload += String(latestTdsValue, 2);
+  payload += ",";
+
+  payload += "\"pump\":";
+  payload += pumpOn ? "1" : "0";
+  payload += ",";
+
+  payload += "\"mist\":";
+  payload += mistOn ? "1" : "0";
+  payload += ",";
+
+  payload += "\"led\":";
+  payload += ledOn ? "1" : "0";
+  payload += ",";
+
+  payload += "\"fan\":";
+  payload += fanOn ? "1" : "0";
+
+  payload += "}";
+
+  publishTopic(PUB_SNAPSHOT, payload);
 }
 
 void setup_wifi() {
@@ -466,6 +521,8 @@ void loop() {
     updateMistState();
     updateLedState();
     updateFanState();
+
+    publishSnapshot();
     Serial.println("");
   }
 
