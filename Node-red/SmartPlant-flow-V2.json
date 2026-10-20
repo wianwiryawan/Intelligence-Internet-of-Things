@@ -21,7 +21,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 400,
-        "y": 360,
+        "y": 160,
         "wires": [
             [
                 "3cc24041d34e39e9",
@@ -43,7 +43,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 390,
-        "y": 500,
+        "y": 340,
         "wires": [
             [
                 "bd375968718544b1",
@@ -64,11 +64,12 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 360,
+        "y": 160,
         "wires": [
             [
                 "e4361fc2024f2078",
-                "6f506c4ef6736e17"
+                "6f506c4ef6736e17",
+                "fd5b2985e587db7e"
             ]
         ]
     },
@@ -86,7 +87,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1110,
-        "y": 360,
+        "y": 100,
         "wires": []
     },
     {
@@ -102,11 +103,12 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 500,
+        "y": 340,
         "wires": [
             [
                 "13ad8b140a566589",
-                "e87d0e79f29b76ca"
+                "e87d0e79f29b76ca",
+                "8d0b0d2cf084c3c9"
             ]
         ]
     },
@@ -124,7 +126,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1100,
-        "y": 500,
+        "y": 280,
         "wires": []
     },
     {
@@ -141,7 +143,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 390,
-        "y": 780,
+        "y": 700,
         "wires": [
             [
                 "0e95a1f4f83d307e",
@@ -163,7 +165,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 370,
-        "y": 920,
+        "y": 880,
         "wires": [
             [
                 "3063b6a51d916c10",
@@ -206,11 +208,12 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 780,
+        "y": 700,
         "wires": [
             [
                 "6da1d20355d66e3b",
-                "2a8f0b4d4154a1a6"
+                "2a8f0b4d4154a1a6",
+                "51cbf3ea368515e6"
             ]
         ]
     },
@@ -228,7 +231,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 780,
+        "y": 640,
         "wires": []
     },
     {
@@ -244,11 +247,12 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 920,
+        "y": 880,
         "wires": [
             [
                 "539817f481ccc698",
-                "6f7299bf6460361a"
+                "6f7299bf6460361a",
+                "7ab6268895c4ae50"
             ]
         ]
     },
@@ -269,7 +273,8 @@
         "wires": [
             [
                 "02e922a87c7e9681",
-                "e75b639367438935"
+                "e75b639367438935",
+                "708bde5a53d108ad"
             ]
         ]
     },
@@ -287,7 +292,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 920,
+        "y": 820,
         "wires": []
     },
     {
@@ -304,7 +309,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 1060,
+        "y": 1000,
         "wires": []
     },
     {
@@ -321,7 +326,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 390,
-        "y": 640,
+        "y": 520,
         "wires": [
             [
                 "0bbdfd3aef0fc633",
@@ -342,11 +347,12 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 640,
+        "y": 520,
         "wires": [
             [
                 "bd66e0962af200e4",
-                "60bf9128675b95e6"
+                "60bf9128675b95e6",
+                "abac513a3f284d85"
             ]
         ]
     },
@@ -364,7 +370,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1100,
-        "y": 640,
+        "y": 460,
         "wires": []
     },
     {
@@ -381,8 +387,8 @@
         "correl": "",
         "expiry": "",
         "broker": "323cb69482501dbf",
-        "x": 800,
-        "y": 1340,
+        "x": 760,
+        "y": 1500,
         "wires": []
     },
     {
@@ -398,8 +404,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 700,
-        "y": 1400,
+        "x": 660,
+        "y": 1560,
         "wires": []
     },
     {
@@ -416,8 +422,8 @@
         "correl": "",
         "expiry": "",
         "broker": "323cb69482501dbf",
-        "x": 800,
-        "y": 1460,
+        "x": 760,
+        "y": 1620,
         "wires": []
     },
     {
@@ -433,8 +439,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 700,
-        "y": 1520,
+        "x": 660,
+        "y": 1680,
         "wires": []
     },
     {
@@ -451,8 +457,8 @@
         "correl": "",
         "expiry": "",
         "broker": "323cb69482501dbf",
-        "x": 800,
-        "y": 1580,
+        "x": 760,
+        "y": 1740,
         "wires": []
     },
     {
@@ -468,8 +474,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 700,
-        "y": 1640,
+        "x": 660,
+        "y": 1800,
         "wires": []
     },
     {
@@ -487,8 +493,8 @@
         "correl": "",
         "expiry": "",
         "broker": "323cb69482501dbf",
-        "x": 830,
-        "y": 1220,
+        "x": 790,
+        "y": 1380,
         "wires": []
     },
     {
@@ -505,8 +511,8 @@
         "correl": "",
         "expiry": "",
         "broker": "323cb69482501dbf",
-        "x": 800,
-        "y": 1700,
+        "x": 760,
+        "y": 1860,
         "wires": []
     },
     {
@@ -522,8 +528,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 700,
-        "y": 1760,
+        "x": 660,
+        "y": 1920,
         "wires": []
     },
     {
@@ -540,8 +546,8 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 700,
-        "y": 1280,
+        "x": 660,
+        "y": 1440,
         "wires": []
     },
     {
@@ -558,7 +564,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 370,
-        "y": 1900,
+        "y": 2000,
         "wires": [
             [
                 "92bf32990a397242",
@@ -580,7 +586,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 370,
-        "y": 2020,
+        "y": 2120,
         "wires": [
             [
                 "53bb278d638dc387",
@@ -602,7 +608,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 360,
-        "y": 2140,
+        "y": 2240,
         "wires": [
             [
                 "45a5337dda0c2b27",
@@ -624,7 +630,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 360,
-        "y": 2260,
+        "y": 2360,
         "wires": [
             [
                 "738cb1299d0217ff",
@@ -647,7 +653,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1200,
-        "y": 420,
+        "y": 220,
         "wires": []
     },
     {
@@ -665,7 +671,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1190,
-        "y": 560,
+        "y": 400,
         "wires": []
     },
     {
@@ -683,7 +689,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1200,
-        "y": 840,
+        "y": 760,
         "wires": []
     },
     {
@@ -701,7 +707,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1190,
-        "y": 980,
+        "y": 940,
         "wires": []
     },
     {
@@ -737,7 +743,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1190,
-        "y": 700,
+        "y": 580,
         "wires": []
     },
     {
@@ -771,8 +777,8 @@
         "enablePointerup": false,
         "pointerupPayload": "",
         "pointerupPayloadType": "str",
-        "x": 350,
-        "y": 1340,
+        "x": 310,
+        "y": 1500,
         "wires": [
             [
                 "927e5b6d2ba20879",
@@ -811,8 +817,8 @@
         "enablePointerup": false,
         "pointerupPayload": "",
         "pointerupPayloadType": "str",
-        "x": 350,
-        "y": 1460,
+        "x": 310,
+        "y": 1620,
         "wires": [
             [
                 "b168d9b27cf59281",
@@ -851,8 +857,8 @@
         "enablePointerup": false,
         "pointerupPayload": "",
         "pointerupPayloadType": "str",
-        "x": 330,
-        "y": 1700,
+        "x": 290,
+        "y": 1860,
         "wires": [
             [
                 "514cfc80fe87f402",
@@ -886,8 +892,8 @@
         "offvalueType": "str",
         "officon": "",
         "offcolor": "",
-        "x": 330,
-        "y": 1580,
+        "x": 290,
+        "y": 1740,
         "wires": [
             [
                 "ed3cb0c64e6c12b9",
@@ -922,8 +928,8 @@
         "offvalueType": "bool",
         "officon": "",
         "offcolor": "",
-        "x": 390,
-        "y": 1220,
+        "x": 350,
+        "y": 1380,
         "wires": [
             [
                 "95fd1409f9c18007",
@@ -951,8 +957,8 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 870,
-        "y": 1960,
+        "x": 830,
+        "y": 2060,
         "wires": []
     },
     {
@@ -975,8 +981,8 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 870,
-        "y": 2080,
+        "x": 830,
+        "y": 2180,
         "wires": []
     },
     {
@@ -1000,7 +1006,7 @@
         "value": "payload",
         "valueType": "msg",
         "x": 810,
-        "y": 2200,
+        "y": 2300,
         "wires": []
     },
     {
@@ -1024,7 +1030,7 @@
         "value": "payload",
         "valueType": "msg",
         "x": 810,
-        "y": 2320,
+        "y": 2420,
         "wires": []
     },
     {
@@ -1076,7 +1082,7 @@
         "styleGlow": false,
         "className": "",
         "x": 710,
-        "y": 420,
+        "y": 220,
         "wires": [
             []
         ]
@@ -1130,7 +1136,7 @@
         "styleGlow": false,
         "className": "",
         "x": 730,
-        "y": 560,
+        "y": 400,
         "wires": [
             []
         ]
@@ -1184,7 +1190,7 @@
         "styleGlow": false,
         "className": "",
         "x": 730,
-        "y": 700,
+        "y": 580,
         "wires": [
             []
         ]
@@ -1232,7 +1238,7 @@
         "styleGlow": false,
         "className": "",
         "x": 700,
-        "y": 840,
+        "y": 760,
         "wires": [
             []
         ]
@@ -1286,7 +1292,7 @@
         "styleGlow": false,
         "className": "",
         "x": 730,
-        "y": 980,
+        "y": 940,
         "wires": [
             []
         ]
@@ -1358,7 +1364,7 @@
         "finalize": "",
         "libs": [],
         "x": 880,
-        "y": 1900,
+        "y": 2000,
         "wires": [
             [
                 "0a0763d3e8a5e48b"
@@ -1378,7 +1384,7 @@
         "finalize": "",
         "libs": [],
         "x": 880,
-        "y": 2020,
+        "y": 2120,
         "wires": [
             [
                 "e5aecd422c98807d"
@@ -1398,7 +1404,7 @@
         "finalize": "",
         "libs": [],
         "x": 880,
-        "y": 2140,
+        "y": 2240,
         "wires": [
             [
                 "8f1669440637336c"
@@ -1418,7 +1424,7 @@
         "finalize": "",
         "libs": [],
         "x": 880,
-        "y": 2260,
+        "y": 2360,
         "wires": [
             [
                 "4bc0e92587ccf0b9"
@@ -1456,7 +1462,7 @@
         "to": "",
         "reg": false,
         "x": 640,
-        "y": 1960,
+        "y": 2060,
         "wires": [
             [
                 "be98be4441a1ccf6"
@@ -1494,7 +1500,7 @@
         "to": "",
         "reg": false,
         "x": 640,
-        "y": 2080,
+        "y": 2180,
         "wires": [
             [
                 "a7cc98c362aa4de5"
@@ -1532,7 +1538,7 @@
         "to": "",
         "reg": false,
         "x": 640,
-        "y": 2200,
+        "y": 2300,
         "wires": [
             [
                 "4e1764fcf9bad809"
@@ -1570,7 +1576,7 @@
         "to": "",
         "reg": false,
         "x": 640,
-        "y": 2320,
+        "y": 2420,
         "wires": [
             [
                 "5c52285ba2cc1a98"
@@ -1592,7 +1598,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1250,
-        "y": 1900,
+        "y": 2000,
         "wires": []
     },
     {
@@ -1610,7 +1616,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1250,
-        "y": 2020,
+        "y": 2120,
         "wires": []
     },
     {
@@ -1628,7 +1634,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1250,
-        "y": 2140,
+        "y": 2240,
         "wires": []
     },
     {
@@ -1646,7 +1652,192 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1250,
-        "y": 2260,
+        "y": 2360,
+        "wires": []
+    },
+    {
+        "id": "fd5b2985e587db7e",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "8fed413d95bcc67d",
+        "name": "Litya Temperature",
+        "measurement": "temperature",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "MTI BINUS",
+        "bucket": "IOT LITYA",
+        "x": 1110,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "8d0b0d2cf084c3c9",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "8fed413d95bcc67d",
+        "name": "Litya Humidity",
+        "measurement": "humidity",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "MTI BINUS",
+        "bucket": "IOT LITYA",
+        "x": 1100,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "abac513a3f284d85",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "8fed413d95bcc67d",
+        "name": "Litya Kelembapan Tanah",
+        "measurement": "kelembapan_tanah",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "MTI BINUS",
+        "bucket": "IOT LITYA",
+        "x": 1130,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "51cbf3ea368515e6",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "8fed413d95bcc67d",
+        "name": "Litya Level Air",
+        "measurement": "level_air",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "MTI BINUS",
+        "bucket": "IOT LITYA",
+        "x": 1100,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "7ab6268895c4ae50",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "8fed413d95bcc67d",
+        "name": "Litya Intensitas Cahaya",
+        "measurement": "cahaya",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "MTI BINUS",
+        "bucket": "IOT LITYA",
+        "x": 1130,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "708bde5a53d108ad",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "8fed413d95bcc67d",
+        "name": "Litya ppm",
+        "measurement": "ppm",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "MTI BINUS",
+        "bucket": "IOT LITYA",
+        "x": 1080,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "d69d8cde1cfcbc81",
+        "type": "mqtt in",
+        "z": "a7fd0d8f86ef3876",
+        "name": "",
+        "topic": "/smartplant/esp32-01/data",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "323cb69482501dbf",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 350,
+        "y": 1220,
+        "wires": [
+            [
+                "3766a640d331978e"
+            ]
+        ]
+    },
+    {
+        "id": "41abecb44d9d06a9",
+        "type": "debug",
+        "z": "a7fd0d8f86ef3876",
+        "name": "Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1070,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "3766a640d331978e",
+        "type": "function",
+        "z": "a7fd0d8f86ef3876",
+        "name": "Transfer to InfluxDB Format",
+        "func": "const data = msg.payload;\n\nconst fields = {\n    temperature: Number(data.temperature),\n    humidity: Number(data.humidity),\n    moisture: Number(data.moisture),\n    water_level: Number(data.water_level),\n    light: Number(data.light),\n    tds: Number(data.tds),\n\n    pump: Number(data.pump),\n    mist: Number(data.mist),\n    led: Number(data.led),\n    fan: Number(data.fan)\n};\n\nconst tags = {\n    device: data.device\n};\n\nmsg.payload = [\n    fields,\n    tags\n];\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 1220,
+        "wires": [
+            [
+                "41abecb44d9d06a9",
+                "ce1f9ab30a272bc4"
+            ]
+        ]
+    },
+    {
+        "id": "ce1f9ab30a272bc4",
+        "type": "influxdb out",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "c53397d839012cf0",
+        "name": "All reading Into Student.SmartPlantIoT",
+        "measurement": "smart_plant",
+        "precision": "",
+        "retentionPolicy": "",
+        "database": "database",
+        "precisionV18FluxV20": "s",
+        "retentionPolicyV18Flux": "",
+        "org": "Student",
+        "bucket": "SmartPlantIoT",
+        "x": 1170,
+        "y": 1300,
         "wires": []
     },
     {
@@ -1766,6 +1957,21 @@
         "groupType": "default"
     },
     {
+        "id": "8fed413d95bcc67d",
+        "type": "influxdb",
+        "hostname": "127.0.0.1",
+        "port": 8086,
+        "protocol": "http",
+        "database": "database",
+        "name": "Litya Influx DB",
+        "usetls": false,
+        "tls": "",
+        "influxdbVersion": "2.0",
+        "url": "https://us-east-1-1.aws.cloud2.influxdata.com",
+        "timeout": 10,
+        "rejectUnauthorized": true
+    },
+    {
         "id": "de304870d854a21c",
         "type": "ui-page",
         "name": "Page 1",
@@ -1841,7 +2047,7 @@
         }
     },
     {
-        "id": "1242ce6e8c2b9f65",
+        "id": "7abc315d48ac893a",
         "type": "global-config",
         "env": [],
         "modules": {
