@@ -115,60 +115,6 @@ void publishTopic(const char* topicName, String value){
   };
 }
 
-void publishSnapshot() {
-  bool pumpOn = digitalRead(RELAY1_PIN_1) == LOW;
-  bool mistOn = digitalRead(RELAY1_PIN_2) == LOW;
-  bool ledOn  = digitalRead(RELAY2_PIN_1) == LOW;
-  bool fanOn  = digitalRead(RELAY2_PIN_2) == LOW;
-
-  String payload = "{";
-
-  payload += "\"device\":\"esp32-01\",";
-
-  payload += "\"temperature\":";
-  payload += String(latestTemperatureValue, 2);
-  payload += ",";
-
-  payload += "\"humidity\":";
-  payload += String(latestAirHumidityValue, 2);
-  payload += ",";
-
-  payload += "\"moisture\":";
-  payload += String(latestSoilMoistureValue, 2);
-  payload += ",";
-
-  payload += "\"water_level\":";
-  payload += String(latestWaterLevel);
-  payload += ",";
-
-  payload += "\"light\":";
-  payload += String(latestLuxValue, 2);
-  payload += ",";
-
-  payload += "\"tds\":";
-  payload += String(latestTdsValue, 2);
-  payload += ",";
-
-  payload += "\"pump\":";
-  payload += pumpOn ? "1" : "0";
-  payload += ",";
-
-  payload += "\"mist\":";
-  payload += mistOn ? "1" : "0";
-  payload += ",";
-
-  payload += "\"led\":";
-  payload += ledOn ? "1" : "0";
-  payload += ",";
-
-  payload += "\"fan\":";
-  payload += fanOn ? "1" : "0";
-
-  payload += "}";
-
-  publishTopic(PUB_SNAPSHOT, payload);
-}
-
 void setup_wifi() {
   delay(100);
   Serial.println();
@@ -353,6 +299,60 @@ void publishActuatorStates() {
   publishTopic(NOTIF_MIST, isMistOn ? ON : OFF);
   publishTopic(NOTIF_LED, isLedOn ? ON : OFF);
   publishTopic(NOTIF_FAN, isFanOn ? ON : OFF);
+}
+
+void publishSnapshot() {
+  bool pumpOn = digitalRead(RELAY1_PIN_1) == LOW;
+  bool mistOn = digitalRead(RELAY1_PIN_2) == LOW;
+  bool ledOn  = digitalRead(RELAY2_PIN_1) == LOW;
+  bool fanOn  = digitalRead(RELAY2_PIN_2) == LOW;
+
+  String payload = "{";
+
+  payload += "\"device\":\"esp32-01\",";
+
+  payload += "\"temperature\":";
+  payload += String(latestTemperatureValue, 2);
+  payload += ",";
+
+  payload += "\"humidity\":";
+  payload += String(latestAirHumidityValue, 2);
+  payload += ",";
+
+  payload += "\"moisture\":";
+  payload += String(latestSoilMoistureValue, 2);
+  payload += ",";
+
+  payload += "\"water_level\":";
+  payload += String(latestWaterLevel);
+  payload += ",";
+
+  payload += "\"light\":";
+  payload += String(latestLuxValue, 2);
+  payload += ",";
+
+  payload += "\"tds\":";
+  payload += String(latestTdsValue, 2);
+  payload += ",";
+
+  payload += "\"pump\":";
+  payload += pumpOn ? "1" : "0";
+  payload += ",";
+
+  payload += "\"mist\":";
+  payload += mistOn ? "1" : "0";
+  payload += ",";
+
+  payload += "\"led\":";
+  payload += ledOn ? "1" : "0";
+  payload += ",";
+
+  payload += "\"fan\":";
+  payload += fanOn ? "1" : "0";
+
+  payload += "}";
+
+  publishTopic(PUB_SNAPSHOT, payload);
 }
 
 void setup() {
