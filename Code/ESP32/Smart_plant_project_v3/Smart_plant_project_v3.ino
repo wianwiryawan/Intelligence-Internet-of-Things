@@ -98,6 +98,12 @@ const char* NOTIF_MIST       = "/smartplant/esp32-01/notification/mist";
 const char* NOTIF_LED        = "/smartplant/esp32-01/notification/led";
 const char* NOTIF_FAN        = "/smartplant/esp32-01/notification/fan";
 
+// Plain-text mode requests: off / rule_based / predictive (publish non-retained).
+const char* CONTROL_MODE = "/smartplant/esp32-01/control/mode";
+const char* STATUS_CONTROL = "/smartplant/esp32-01/status/control";
+enum class PumpControlMode { Off, RuleBased, Predictive };
+PumpControlMode pumpControlMode = PumpControlMode::Off; // Explicit selection after reboot.
+
 const char* ON               = "1"; // ON
 const char* OFF              = "0"; // OFF
 
@@ -167,7 +173,58 @@ unsigned long mistPulseStart = 0;
 unsigned long ledPulseStart = 0;
 unsigned long fanPulseStart = 0;
 
+const char* pumpModeName() {
+  switch (pumpControlMode) {
+    case PumpControlMode::RuleBased: return "rule_based";
+    case PumpControlMode::Predictive: return "predictive";
+    default: return "off";
+  }
+}
+
+void stopPump() {
+  bool wasOn = isPumpPulseActive || digitalRead(RELAY1_PIN_1) == LOW;
+  digitalWrite(RELAY1_PIN_1, HIGH);
+  isPumpPulseActive = false;
+  if (wasOn && client.connected()) publishTopic(NOTIF_PUMP, OFF);
+}
+
+void publishControlStatus() {
+  String status = "{\"mode\":\"";
+  status += pumpModeName();
+  // Predictive pump commands are NOT implemented in this mode-selection stage.
+  status += "\",\"predictive_ready\":false,\"pump_on\":";
+  status += digitalRead(RELAY1_PIN_1) == LOW ? "true" : "false";
+  status += "}";
+  publishTopic(STATUS_CONTROL, status);
+}
+
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  if (strcmp(topic, CONTROL_MODE) != 0) return;
+  if (length == 0 || length >= 20) {
+    Serial.println("Rejected invalid pump mode payload length");
+    return;
+  }
+  // MQTT payload is not null-terminated. Parse using its explicit length.
+  String requested;
+  for (unsigned int i = 0; i < length; i++) requested += (char)payload[i];
+  PumpControlMode nextMode;
+  if (requested == "off") nextMode = PumpControlMode::Off;
+  else if (requested == "rule_based") nextMode = PumpControlMode::RuleBased;
+  else if (requested == "predictive") nextMode = PumpControlMode::Predictive;
+  else {
+    Serial.println("Rejected unknown pump control mode");
+    publishControlStatus();
+    return;
+  }
+  // A mode request always stops an active pulse before applying the mode.
+  stopPump();
+  pumpControlMode = nextMode;
+  publishControlStatus();
+}
+
 void updatePumpState() {
+  // Only the rule-based mode may trigger the existing threshold controller.
+  if (pumpControlMode != PumpControlMode::RuleBased) return;
   if (latestWaterLevel < 0 || latestTdsValue < 0 || latestSoilMoistureValue < 0) {
     return;
   }
@@ -325,6 +382,7 @@ void setup() {
   const int mqttPort = isCloud ? cloudMqttPort : localMqttPort;
   
   client.setServer(mqttServer, mqttPort);
+  client.setCallback(mqttCallback);
   // END MQTT Setup
 
   dht.begin();
@@ -335,7 +393,9 @@ void reconnect() {
   while (!client.connected()) {
     Serial.print("Attempting MQTT connection...");
     if (client.connect("ESPClient")) {
+      client.subscribe(CONTROL_MODE);
       publishActuatorStates();
+      publishControlStatus();
       Serial.println("connected");
       digitalWrite(LED_PIN_MQTT, HIGH);
     } else {
@@ -442,7 +502,10 @@ const unsigned long SENSOR_INTERVAL = 5000;
 unsigned long lastSensorRead = 0;
 
 void loop() {
+  // Never enter the existing blocking reconnect loop with the pump energized.
+  checkPulseTimers();
   if (!client.connected()) {
+    stopPump();
     reconnect();
   }
 

@@ -1,0 +1,100 @@
+# Smart Plant moisture forecasting
+
+Python 3.10+ CLI for EDA, training, offline prediction, and live MQTT forecasts at **5, 10, and 15 minutes**. Run commands from this directory in PowerShell.
+
+## Setup and training
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe forecast.py train --csv "H:\File\MyGithub\MyNote\Master Of Computer Science\Inteligent Internet of Things (COMP8078041)\Final Project (AOL)\AOL_Dataset.csv"
+.\.venv\Scripts\python.exe -m unittest -v
+```
+
+Training creates `outputs/` with sensor summary, gap list, one-minute dataset, EDA plot, chronological validation/test metrics, held-out prediction CSV/plot, and `model.joblib`. It does not alter the source CSV.
+
+Inputs are `time`, `device`, `moisture`, `temperature`, `humidity`, and `light`. Device defaults to `esp32-01`. Moisture is assumed to be a calibrated percentage. Sensor readings are aggregated into one-minute means, requiring at least three valid observations per sensor per minute. No missing-minute interpolation is performed. Invalid humidity/moisture outside 0–100, negative light, and temperatures outside -40–80 are treated as missing. These are basic validity checks, not proof of calibration.
+
+The previous 30 complete minutes supply lags, rolling means/deviations, and changes. Independent models predict the minute-average moisture at each horizon. A timestamp T means the average over [T-1 minute, T); forecasting at T+5 predicts that future minute's average, not an instantaneous reading.
+
+The first 70% of eligible origins train candidates; the next 15% select between persistence, Random Forest, and gradient boosting using MAE. The final 15% are held out for testing. Labels extending into the following period are purged. Selected models are refit on development data for testing, then on all eligible data for deployment. Test results therefore describe the evaluation fit, not a new independent evaluation of the deployment refit. No random temporal split or random early-stopping validation is used. MAE/RMSE units are moisture percentage points. Persistence can win; that indicates the ML model has not demonstrated a useful improvement.
+
+Actuator fields are deliberately excluded because sampled notifications may not represent pulse duration. Predictions reflect the historical controller's behavior, not a counterfactual forecast with the pump disabled. Record additional realistic drying/watering cycles before relying on predictive control. This implementation does not estimate confidence intervals.
+
+## Offline forecast
+
+```powershell
+.\.venv\Scripts\python.exe forecast.py predict --csv "H:\File\MyGithub\MyNote\Master Of Computer Science\Inteligent Internet of Things (COMP8078041)\Final Project (AOL)\AOL_Dataset.csv" --model outputs/model.joblib
+```
+
+Uses the latest completed clock minute in the CSV; fails clearly if there is insufficient recent history. It does not silently forecast from an older valid session. This is a forecast from the CSV's time, not necessarily from the current wall clock.
+
+Your current CSV ends with a recording session shorter than 30 minutes. For a demonstration using its earlier complete session, append `--at "2026-11-06T19:40:00Z"` to the prediction command. A historical prediction using the deployment model is a functionality demonstration, not a held-out evaluation; use `test_predictions.csv` for evaluation.
+
+## Live MQTT service
+
+```powershell
+.\.venv\Scripts\python.exe forecast.py serve --host 192.168.1.29 --model outputs/model.joblib
+```
+
+Subscribes to existing topics:
+
+```text
+/smartplant/esp32-01/sensor/moisture
+/smartplant/esp32-01/sensor/temperature
+/smartplant/esp32-01/sensor/humidity
+/smartplant/esp32-01/sensor/light
+```
+
+Each input payload must be a plain numeric value. Live timestamps use service receipt time because these ESP32 payloads have no measurement timestamp. Keep the service computer's clock synchronized and use a low-latency connection. Retained messages are ignored. Reconnection resets history to avoid treating stale data as fresh. Startup/reconnection needs roughly 30–31 minutes to accumulate complete history. Missing/sparse minutes suppress forecasts until history is complete again.
+
+Publishes once per minute to `/smartplant/esp32-01/prediction/moisture` with QoS 1 and retain disabled:
+
+```json
+{
+  "device": "esp32-01",
+  "origin_utc": "2026-11-07T03:00:00+00:00",
+  "generated_at_utc": "2026-11-07T03:00:01+00:00",
+  "target_definition": "mean moisture during minute ending at target_time_utc",
+  "current_minute_moisture": 62.0,
+  "forecasts": {
+    "5m": {"moisture": 61.8, "target_time_utc": "2026-11-07T03:05:00+00:00"},
+    "10m": {"moisture": 61.5, "target_time_utc": "2026-11-07T03:10:00+00:00"},
+    "15m": {"moisture": 61.1, "target_time_utc": "2026-11-07T03:15:00+00:00"}
+  }
+}
+```
+
+Numbers above are illustrative. In Node-RED, add MQTT-in for the output topic and a JSON node, then read `msg.payload.forecasts["5m"].moisture` (and `10m`/`15m`). Persist origin time, target time, horizon, prediction, and later actual values to InfluxDB for Grafana. Deduplicate QoS 1 deliveries by device + origin + horizon. Reject stale origins in consumers.
+
+Actual payloads also include `selected_models` so consumers can identify persistence versus ML. All fitted ML candidates are saved under `ml_candidates` in the model artifact, even if persistence wins. `metrics.json` includes held-out scores for every candidate; candidate selection still uses validation data only.
+
+### Compare all three models live
+
+The service now adds `model_forecasts`, an array with nine records: persistence, random_forest, and gradient_boosting at each of 5m, 10m, and 15m. Each record contains `model`, `horizon`, `moisture`, and `target_time_utc`. The original `forecasts` and `selected_models` remain unchanged and still describe validation-selected forecasts. ML comparison output does not change model selection or actuator behavior.
+
+Restart the service to use this update. The existing artifact includes trained candidates; no retraining is needed unless the service warns that candidates are missing. Restarting requires a fresh 30–31-minute history.
+
+Replace the prediction-formatting Function node with the contents of `node_red_forecasts.js`. Connect its output to `influxdb batch` with the existing bucket/organization and `ms` precision. Do not leave the old formatter writing the same records in parallel. This function stores all nine points with their actual model tags. Deduplicate deliveries by device + origin + horizon + model.
+
+The forecast Flux query already groups by horizon and model. In its Grafana display-name override, use `Forecast ${__field.labels.horizon} — ${__field.labels.model}`. Initially filter the prediction query to `r.horizon == "10m"` to compare three model lines against actual moisture without nine overlapping lines. Keep the full nine-series view available for other horizons. The error-table query also retains the model label, so it can compare each candidate separately.
+
+Offline predictions from the deployment artifact on its training period are smoke tests only, not new evidence of predictive performance. Use the held-out report or newly collected live outcomes for evaluation.
+
+### Gradient boosting policy preview
+
+Copy `node_red_gradient_policy.js` into a new one-output Function node called `Gradient Boosting Policy Preview`. Branch from the parsed MQTT payload BEFORE database formatting: MQTT/JSON -> policy Function -> Debug. Keep the existing database branch. Do not connect this preview output to a pump MQTT node or InfluxDB batch; its schema is a decision object.
+
+This explicitly uses `model_forecasts` with `model=gradient_boosting` and `horizon=10m`, independently of `selected_models`. No retraining or Python changes are needed. The 10-minute horizon is an experimental starting choice. Gradient boosting has not been established as better than persistence by the current results.
+
+Preview: predict <=60 and current <70 produces `would_water`; otherwise `hold`. Invalid/missing candidates, origins older than 90 seconds or in the future, invalid target times, and invalid moisture produce `reject`. The constants are provisional; 60 matches existing firmware while 70 is a proposed upper guard. Verify calibration and crop-specific limits. Clock synchronization is needed for age checks.
+
+The node only describes whether moisture conditions qualify. It does NOT check reservoir/TDS, actuator state, cooldown, duplicates, or command expiry, and never sends commands. Those controls must be implemented in the command path and firmware before automatic irrigation. Repeated `would_water` messages are expected while the condition persists; they are not watering events.
+
+Run `node test_gradient_policy.js` for policy regression checks.
+
+This service publishes forecasts only. The current ESP32 firmware does not subscribe to actuator commands, so running this service does not enable automatic predictive irrigation. Retain the existing controller while evaluating forecasts. A subsequent control integration needs pump command handling, current water/TDS checks, bounded pulses, cooldown, and stale-prediction handling.
+
+For authenticated brokers, set `MQTT_USERNAME` and `MQTT_PASSWORD` in the environment. Use `--tls --port 8883` when the broker supports TLS. Never commit passwords. Only load your own trusted `model.joblib` files. Keep the dependency environment used for training when serving a saved model.
+
+API references: [scikit-learn time series splitting](https://scikit-learn.org/stable/modules/generated/sklearn.model_selection.TimeSeriesSplit.html), [Paho MQTT Python](https://eclipse.dev/paho/clients/python/docs/).
