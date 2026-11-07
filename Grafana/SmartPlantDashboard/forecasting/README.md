@@ -89,11 +89,13 @@ This explicitly uses `model_forecasts` with `model=gradient_boosting` and `horiz
 
 Preview: predict <=60 and current <70 produces `would_water`; otherwise `hold`. Invalid/missing candidates, origins older than 90 seconds or in the future, invalid target times, and invalid moisture produce `reject`. The constants are provisional; 60 matches existing firmware while 70 is a proposed upper guard. Verify calibration and crop-specific limits. Clock synchronization is needed for age checks.
 
-The node only describes whether moisture conditions qualify. It does NOT check reservoir/TDS, actuator state, cooldown, duplicates, or command expiry, and never sends commands. Those controls must be implemented in the command path and firmware before automatic irrigation. Repeated `would_water` messages are expected while the condition persists; they are not watering events.
+The node only describes whether moisture conditions qualify. It does NOT check reservoir/TDS, actuator state, cooldown, duplicates, or command expiry, and never sends commands. Repeated `would_water` messages are expected while the condition persists; they are not watering events. The command path is now provided separately in `node_red_pump_command.js` and updated ESP32 firmware; see the firmware folder's `CONTROL_MODES.md` for wiring, ArduinoJson 7 installation, limits, and hardware tests.
+
+The command Function needs TWO outputs: output 1 -> MQTT out (control/pump, QoS 0, retain false); output 2 -> Debug. Feed parsed status/control MQTT messages and policy-preview decisions into it. The sender defaults to `ENABLE_COMMANDS = false`, allowing observation before physical tests. Do not enable until the updated firmware has been compiled/uploaded and the documented checks are understood. The current sketch remains off after reboot until a mode is explicitly chosen. Tests: `node test_pump_command.js`.
 
 Run `node test_gradient_policy.js` for policy regression checks.
 
-This service publishes forecasts only. The current ESP32 firmware does not subscribe to actuator commands, so running this service does not enable automatic predictive irrigation. Retain the existing controller while evaluating forecasts. A subsequent control integration needs pump command handling, current water/TDS checks, bounded pulses, cooldown, and stale-prediction handling.
+This Python service publishes forecasts only. The updated ESP32 sketch and separate Node-RED command Function now implement the predictive command path, but require firmware upload and explicit enablement as described below. Running Python alone does not enable automatic irrigation.
 
 For authenticated brokers, set `MQTT_USERNAME` and `MQTT_PASSWORD` in the environment. Use `--tls --port 8883` when the broker supports TLS. Never commit passwords. Only load your own trusted `model.joblib` files. Keep the dependency environment used for training when serving a saved model.
 
