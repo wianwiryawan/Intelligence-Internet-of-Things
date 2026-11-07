@@ -68,8 +68,7 @@
         "wires": [
             [
                 "e4361fc2024f2078",
-                "6f506c4ef6736e17",
-                "fd5b2985e587db7e"
+                "6f506c4ef6736e17"
             ]
         ]
     },
@@ -87,7 +86,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1110,
-        "y": 100,
+        "y": 160,
         "wires": []
     },
     {
@@ -107,8 +106,7 @@
         "wires": [
             [
                 "13ad8b140a566589",
-                "e87d0e79f29b76ca",
-                "8d0b0d2cf084c3c9"
+                "e87d0e79f29b76ca"
             ]
         ]
     },
@@ -126,7 +124,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1100,
-        "y": 280,
+        "y": 340,
         "wires": []
     },
     {
@@ -212,8 +210,7 @@
         "wires": [
             [
                 "6da1d20355d66e3b",
-                "2a8f0b4d4154a1a6",
-                "51cbf3ea368515e6"
+                "2a8f0b4d4154a1a6"
             ]
         ]
     },
@@ -231,7 +228,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 640,
+        "y": 700,
         "wires": []
     },
     {
@@ -251,8 +248,7 @@
         "wires": [
             [
                 "539817f481ccc698",
-                "6f7299bf6460361a",
-                "7ab6268895c4ae50"
+                "6f7299bf6460361a"
             ]
         ]
     },
@@ -273,8 +269,7 @@
         "wires": [
             [
                 "02e922a87c7e9681",
-                "e75b639367438935",
-                "708bde5a53d108ad"
+                "e75b639367438935"
             ]
         ]
     },
@@ -292,7 +287,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 820,
+        "y": 880,
         "wires": []
     },
     {
@@ -309,7 +304,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 1000,
+        "y": 1060,
         "wires": []
     },
     {
@@ -351,8 +346,7 @@
         "wires": [
             [
                 "bd66e0962af200e4",
-                "60bf9128675b95e6",
-                "abac513a3f284d85"
+                "60bf9128675b95e6"
             ]
         ]
     },
@@ -370,7 +364,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1100,
-        "y": 460,
+        "y": 520,
         "wires": []
     },
     {
@@ -1656,114 +1650,6 @@
         "wires": []
     },
     {
-        "id": "fd5b2985e587db7e",
-        "type": "influxdb out",
-        "z": "a7fd0d8f86ef3876",
-        "influxdb": "8fed413d95bcc67d",
-        "name": "Litya Temperature",
-        "measurement": "temperature",
-        "precision": "",
-        "retentionPolicy": "",
-        "database": "database",
-        "precisionV18FluxV20": "s",
-        "retentionPolicyV18Flux": "",
-        "org": "MTI BINUS",
-        "bucket": "IOT LITYA",
-        "x": 1110,
-        "y": 160,
-        "wires": []
-    },
-    {
-        "id": "8d0b0d2cf084c3c9",
-        "type": "influxdb out",
-        "z": "a7fd0d8f86ef3876",
-        "influxdb": "8fed413d95bcc67d",
-        "name": "Litya Humidity",
-        "measurement": "humidity",
-        "precision": "",
-        "retentionPolicy": "",
-        "database": "database",
-        "precisionV18FluxV20": "s",
-        "retentionPolicyV18Flux": "",
-        "org": "MTI BINUS",
-        "bucket": "IOT LITYA",
-        "x": 1100,
-        "y": 340,
-        "wires": []
-    },
-    {
-        "id": "abac513a3f284d85",
-        "type": "influxdb out",
-        "z": "a7fd0d8f86ef3876",
-        "influxdb": "8fed413d95bcc67d",
-        "name": "Litya Kelembapan Tanah",
-        "measurement": "kelembapan_tanah",
-        "precision": "",
-        "retentionPolicy": "",
-        "database": "database",
-        "precisionV18FluxV20": "s",
-        "retentionPolicyV18Flux": "",
-        "org": "MTI BINUS",
-        "bucket": "IOT LITYA",
-        "x": 1130,
-        "y": 520,
-        "wires": []
-    },
-    {
-        "id": "51cbf3ea368515e6",
-        "type": "influxdb out",
-        "z": "a7fd0d8f86ef3876",
-        "influxdb": "8fed413d95bcc67d",
-        "name": "Litya Level Air",
-        "measurement": "level_air",
-        "precision": "",
-        "retentionPolicy": "",
-        "database": "database",
-        "precisionV18FluxV20": "s",
-        "retentionPolicyV18Flux": "",
-        "org": "MTI BINUS",
-        "bucket": "IOT LITYA",
-        "x": 1100,
-        "y": 700,
-        "wires": []
-    },
-    {
-        "id": "7ab6268895c4ae50",
-        "type": "influxdb out",
-        "z": "a7fd0d8f86ef3876",
-        "influxdb": "8fed413d95bcc67d",
-        "name": "Litya Intensitas Cahaya",
-        "measurement": "cahaya",
-        "precision": "",
-        "retentionPolicy": "",
-        "database": "database",
-        "precisionV18FluxV20": "s",
-        "retentionPolicyV18Flux": "",
-        "org": "MTI BINUS",
-        "bucket": "IOT LITYA",
-        "x": 1130,
-        "y": 880,
-        "wires": []
-    },
-    {
-        "id": "708bde5a53d108ad",
-        "type": "influxdb out",
-        "z": "a7fd0d8f86ef3876",
-        "influxdb": "8fed413d95bcc67d",
-        "name": "Litya ppm",
-        "measurement": "ppm",
-        "precision": "",
-        "retentionPolicy": "",
-        "database": "database",
-        "precisionV18FluxV20": "s",
-        "retentionPolicyV18Flux": "",
-        "org": "MTI BINUS",
-        "bucket": "IOT LITYA",
-        "x": 1080,
-        "y": 1060,
-        "wires": []
-    },
-    {
         "id": "d69d8cde1cfcbc81",
         "type": "mqtt in",
         "z": "a7fd0d8f86ef3876",
@@ -1789,7 +1675,7 @@
         "type": "debug",
         "z": "a7fd0d8f86ef3876",
         "name": "Output",
-        "active": true,
+        "active": false,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1957,21 +1843,6 @@
         "groupType": "default"
     },
     {
-        "id": "8fed413d95bcc67d",
-        "type": "influxdb",
-        "hostname": "127.0.0.1",
-        "port": 8086,
-        "protocol": "http",
-        "database": "database",
-        "name": "Litya Influx DB",
-        "usetls": false,
-        "tls": "",
-        "influxdbVersion": "2.0",
-        "url": "https://us-east-1-1.aws.cloud2.influxdata.com",
-        "timeout": 10,
-        "rejectUnauthorized": true
-    },
-    {
         "id": "de304870d854a21c",
         "type": "ui-page",
         "name": "Page 1",
@@ -2047,7 +1918,7 @@
         }
     },
     {
-        "id": "7abc315d48ac893a",
+        "id": "af22cac4caf21e76",
         "type": "global-config",
         "env": [],
         "modules": {
