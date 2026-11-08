@@ -95,6 +95,18 @@ The command Function needs TWO outputs: output 1 -> MQTT out (control/pump, QoS 
 
 Run `node test_gradient_policy.js` for policy regression checks.
 
+### Store policy decisions and explanations in Grafana
+
+Copy `node_red_decision_log.js` into a NEW one-output Function named `Decision to InfluxDB`. Branch from `Gradient Boosting Policy Preview` (not the raw forecast and not the Pump Command debug output) into this Function -> NEW `influxdb batch`. Configure the existing connection/org/bucket SmartPlantIoT and ms precision. Retain the existing branch from policy to Pump Command unchanged. The logger creates a new message, preserving the original policy message for the command branch.
+
+Measurement: `moisture_policy_decision`; tags: device/model/horizon/stage. Fields include decision, reason_code, a human-readable explanation, exact numeric moisture/threshold inputs when available, origin/target epoch times, and decision_code (would_water=1, hold=0, reject=-1). Invalid/non-finite optional inputs are omitted, not replaced with fake zeroes. Timestamps are policy evaluation times. Same timestamp+tags overwrites the same point, making exact-message retries idempotent; independently reevaluated events may produce separate records.
+
+These explanations describe deterministic CONTROL POLICY checks applied to a model forecast. They are NOT feature attribution, SHAP values, model confidence, or an explanation of why gradient boosting predicted a particular number. The logger records all supported decisions, including holds/rejections. `would_water` is not a command acknowledgement or proof of watering. The false `actuator_command_sent_at_policy_stage` field only describes this stage and is not evidence about later command delivery. Status/command acknowledgements must be logged separately if an end-to-end actuator audit is needed.
+
+In Grafana add a Table panel using `grafana_decision_history.flux`. Organize fields after its final group() and show time, model, horizon, decision, predicted/current moisture, threshold, and explanation. Use a 1-minute refresh. This query uses dashboard time range; start recording now because older decisions cannot be recovered with their original evaluation context. Decision code can also supply a State timeline: 1 yellow (Would water), 0 green (Hold), -1 red (Rejected). Never label it Pump ON/OFF.
+
+Run `node test_decision_log.js` to check formatting, reasoning text, invalid input handling, timestamp alignment, and that logging preserves the control message.
+
 This Python service publishes forecasts only. The updated ESP32 sketch and separate Node-RED command Function now implement the predictive command path, but require firmware upload and explicit enablement as described below. Running Python alone does not enable automatic irrigation.
 
 For authenticated brokers, set `MQTT_USERNAME` and `MQTT_PASSWORD` in the environment. Use `--tls --port 8883` when the broker supports TLS. Never commit passwords. Only load your own trusted `model.joblib` files. Keep the dependency environment used for training when serving a saved model.
