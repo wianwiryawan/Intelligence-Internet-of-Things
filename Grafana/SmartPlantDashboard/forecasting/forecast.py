@@ -14,13 +14,21 @@ import pandas as pd
 from sklearn.ensemble import HistGradientBoostingRegressor, RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
+# Kolom sensor yang wajib tersedia; moisture menjadi variabel yang diprediksi.
 SENSORS = ['moisture', 'temperature', 'humidity', 'light']
+# Jarak prediksi ke depan dalam menit; dibuat satu model per horizon.
 HORIZONS = [5, 10, 15]
+# Jumlah menit berurutan yang dibutuhkan untuk membentuk fitur.
 HISTORY = 30
 LOG = logging.getLogger(__name__)
 
 
 def clean(raw, device):
+    """Memilih data satu perangkat dan membersihkan waktu serta nilai sensor.
+
+    Nilai tidak valid menjadi NaN (data hilang), bukan diganti dengan nol.
+    Hasilnya memakai waktu UTC sebagai indeks agar bisa dikelompokkan per menit."""
+    # Validasi struktur CSV sebelum memilih perangkat yang diminta.
     required = ['time', 'device', *SENSORS]
     missing = set(required) - set(raw.columns)
     if missing:
@@ -35,18 +43,29 @@ def clean(raw, device):
         frame.loc[~frame[col].between(0, 100), col] = np.nan
     frame.loc[frame.light < 0, 'light'] = np.nan
     frame.loc[~frame.temperature.between(-40, 80), 'temperature'] = np.nan
+    # Jika ada waktu duplikat, pertahankan baris terakhir pada urutan yang ada.
     return frame.drop_duplicates('time', keep='last').set_index('time')[SENSORS]
 
 
 def minute_data(frame):
+    """Menghitung rata-rata setiap sensor dalam interval satu menit.
+
+    Label T mewakili interval [T-1 menit, T), sehingga data tepat pada T
+    masuk interval berikutnya. Setiap sensor perlu minimal tiga nilai valid."""
     """Right-labelled completed bins: timestamp T summarizes [T-1min, T)."""
     means = frame.resample('1min', closed='left', label='right').mean()
     counts = frame.resample('1min', closed='left', label='right').count()
-    # No interpolation: sparse/missing minutes break history and target windows.
+    # Tidak ada interpolasi: menit kosong atau terlalu sedikit sampel tetap NaN.
+    # Kekosongan ini membuat jendela riwayat/target terkait tidak memenuhi syarat.
     return means.where(counts >= 3)
 
 
 def features(minutes):
+    """Mengubah riwayat sensor menjadi fitur masukan model.
+
+    Lag adalah nilai beberapa menit sebelumnya; lag 0 adalah menit terkini
+    yang sudah selesai. Mean, std, dan change merangkum level, variasi,
+    serta perubahan sensor. Hanya riwayat 30 menit lengkap yang diterima."""
     columns = {}
     for sensor in SENSORS:
         for lag in [0, 1, 2, 5, 10, 15, 20, 29]:
@@ -56,20 +75,32 @@ def features(minutes):
             columns[f'{sensor}_std_{window}'] = minutes[sensor].rolling(window).std()
         columns[f'{sensor}_change_5'] = minutes[sensor] - minutes[sensor].shift(5)
     x = pd.DataFrame(columns, index=minutes.index)
+    # Seluruh sensor harus valid pada setiap menit dalam 30 menit terakhir.
     complete = minutes.notna().all(axis=1).rolling(HISTORY).sum().eq(HISTORY)
     return x.loc[complete].dropna()
 
 
 def supervised(minutes):
+    """Memasangkan fitur saat ini (X) dengan kelembapan masa depan (y).
+
+    Target untuk setiap horizon adalah rata-rata moisture pada menit tersebut,
+    bukan rata-rata seluruh periode menuju horizon. Semua sensor harus lengkap
+    dari waktu asal sampai 15 menit ke depan agar pasangan data diterima."""
     x = features(minutes)
+    # shift(-h) menempatkan nilai h menit mendatang pada baris waktu asal.
     y = pd.DataFrame({h: minutes.moisture.shift(-h) for h in HORIZONS})
-    # All intervening minutes must exist, not just the endpoint.
+    # Pemeriksaan dari arah belakang memastikan seluruh menit menuju target ada.
     valid = minutes.notna().all(axis=1).iloc[::-1].rolling(max(HORIZONS) + 1).sum().iloc[::-1]
     keep = x.index.intersection(y.index[valid.eq(max(HORIZONS) + 1)])
     return x.loc[keep], y.loc[keep]
 
 
 def candidates():
+    """Membuat model baru untuk setiap proses pelatihan.
+
+    Random Forest menggabungkan prediksi banyak pohon; gradient boosting
+    membangun pohon bertahap untuk memperbaiki kesalahan sebelumnya.
+    random_state membuat pengacakan dapat diulang dengan konfigurasi sama."""
     return {
         'random_forest': RandomForestRegressor(n_estimators=150, max_depth=12,
                                                min_samples_leaf=5, random_state=42, n_jobs=-1),
@@ -80,12 +111,23 @@ def candidates():
 
 
 def scores(actual, predicted):
+    """Menghitung kesalahan prediksi: MAE dan RMSE; semakin kecil semakin baik.
+
+    MAE adalah rata-rata selisih absolut, sedangkan RMSE memberi penalti
+    lebih besar pada kesalahan besar. Satuannya mengikuti moisture
+    (poin persentase jika moisture dinyatakan dalam persen)."""
     return {'mae': float(mean_absolute_error(actual, predicted)),
             'rmse': float(np.sqrt(mean_squared_error(actual, predicted)))}
 
 
 def train(args):
+    """Menjalankan EDA, pemilihan model, evaluasi, dan penyimpanan model.
+
+    Urutan waktu dipertahankan: sekitar 70% awal untuk train, 15% berikutnya
+    untuk validasi, dan 15% akhir untuk test, sebelum pembuangan batas label.
+    Model dipilih terpisah untuk horizon 5, 10, dan 15 menit."""
     import matplotlib
+    # Backend noninteraktif: grafik disimpan ke berkas tanpa membuka jendela.
     matplotlib.use('Agg')
     import matplotlib.pyplot as plt
 
@@ -96,6 +138,7 @@ def train(args):
     if frame.empty:
         raise ValueError('No usable rows for requested device')
     minutes = minute_data(frame)
+    # Simpan hasil eksplorasi data: agregasi, statistik, jeda, dan grafik sensor.
     minutes.to_csv(out / 'minute_data.csv')
     frame.describe().to_csv(out / 'sensor_summary.csv')
     gaps = frame.index.to_series().diff().dt.total_seconds()
@@ -110,10 +153,12 @@ def train(args):
         raise ValueError(f'Only {len(x)} eligible windows; collect more continuous data (need >=300).')
     val_start = x.index[int(len(x) * .70)]
     test_start = x.index[int(len(x) * .85)]
-    # Purge labels that reach into the following period.
+    # Buang sampel yang target 15 menitnya mencapai periode berikutnya.
+    # Ini mencegah label train/validasi mengambil data dari periode sesudahnya.
     train_mask = x.index + pd.Timedelta(minutes=max(HORIZONS)) < val_start
     val_mask = (x.index >= val_start) & (x.index + pd.Timedelta(minutes=max(HORIZONS)) < test_start)
     test_mask = x.index >= test_start
+    # Data pengembangan menggabungkan train dan validasi sebelum periode test.
     dev_mask = x.index + pd.Timedelta(minutes=max(HORIZONS)) < test_start
     if min(train_mask.sum(), val_mask.sum(), test_mask.sum()) < 30:
         raise ValueError('Insufficient chronological split after label purging.')
@@ -126,23 +171,31 @@ def train(args):
                 'trained_through_utc': str(frame.index.max()), 'models': {},
                 'ml_candidates': {}, 'selected': {}, 'version': 1}
     predictions = pd.DataFrame(index=x.index[test_mask])
+    # Pemilihan dan evaluasi dilakukan secara terpisah untuk setiap horizon.
     for horizon in HORIZONS:
         target = y[horizon]
+        # Persistence menganggap moisture masa depan sama dengan nilai saat ini.
+        # Baseline ini ikut dipilih jika MAE validasinya paling kecil.
         validation = {'persistence': scores(target[val_mask], x.loc[val_mask, 'moisture_lag_0'])}
         for name, model in candidates().items():
             model.fit(x[train_mask], target[train_mask])
             validation[name] = scores(target[val_mask], model.predict(x[val_mask]))
+        # Pemilihan hanya memakai validasi; skor test tidak menentukan pemenang.
         winner = min(validation, key=lambda name: validation[name]['mae'])
         baseline = x.loc[test_mask, 'moisture_lag_0'].to_numpy()
         test_scores = {'persistence': scores(target[test_mask], baseline)}
         deployment_candidates = {}
         predicted = baseline
         for name, model in candidates().items():
+            # Latih ulang dengan data pengembangan, lalu nilai pada test terpisah.
             model.fit(x[dev_mask], target[dev_mask])
             candidate_prediction = model.predict(x[test_mask])
             test_scores[name] = scores(target[test_mask], candidate_prediction)
             if name == winner:
                 predicted = candidate_prediction
+            # Setelah prediksi test kandidat dihitung, latih model deployment
+            # dengan seluruh data yang memenuhi syarat, termasuk periode test.
+            # Skor test di atas menilai model sebelum pelatihan ulang ini.
             model.fit(x, target)
             deployment_candidates[name] = model
         report['horizons'][horizon] = {'selected': winner, 'validation': validation,
@@ -152,7 +205,7 @@ def train(args):
         predictions[f'actual_{horizon}m'] = target[test_mask]
         predictions[f'predicted_{horizon}m'] = predicted
         predictions[f'persistence_{horizon}m'] = baseline
-        # Deployment is refitted after the held-out evaluation is complete.
+        # None menandakan bahwa persistence terpilih, sehingga tidak perlu model ML.
         artifact['models'][horizon] = deployment_candidates.get(winner)
         artifact['ml_candidates'][horizon] = deployment_candidates
         artifact['selected'][horizon] = winner
@@ -166,12 +219,17 @@ def train(args):
     fig.savefig(out / 'forecast_evaluation.png', dpi=140)
     plt.close(fig)
     (out / 'metrics.json').write_text(json.dumps(report, indent=2), encoding='utf-8')
+    # Artefak menyimpan model, urutan fitur, identitas perangkat, dan metadata.
     joblib.dump(artifact, out / 'model.joblib')
     print(json.dumps(report, indent=2))
 
 
 def load_model(path):
-    # Load only trusted local joblib files; pickle deserialization executes code.
+    """Membaca model beserta metadata dan memeriksa kompatibilitasnya.
+
+    Gunakan berkas joblib dari sumber tepercaya karena proses pemuatan
+    dapat menjalankan kode yang tersimpan di dalam berkas."""
+    # Deserialisasi joblib/pickle dapat menjalankan kode; sumber harus tepercaya.
     artifact = joblib.load(path)
     if artifact.get('version') != 1 or artifact['sensors'] != SENSORS:
         raise ValueError('Incompatible model artifact')
@@ -179,9 +237,15 @@ def load_model(path):
 
 
 def predict(artifact, minutes, origin):
+    """Memprediksi moisture dari satu waktu asal menggunakan model tersimpan.
+
+    origin adalah waktu akhir menit terakhir yang sudah selesai. Keluaran
+    memuat prediksi model terpilih serta semua kandidat yang tersedia.
+    Fungsi ini menghasilkan data prediksi, tanpa mengirim perintah pompa."""
     x = features(minutes)
     if origin not in x.index:
         raise ValueError('Need 30 consecutive complete minutes, >=3 observations per sensor per minute.')
+    # Pertahankan format tabel satu baris dan urutan fitur seperti saat pelatihan.
     x = x.loc[[origin], artifact['feature_names']]
     forecasts = {}
     model_forecasts = []
@@ -207,12 +271,16 @@ def predict(artifact, minutes, origin):
 
 
 def forecast_csv(args):
+    """Menghasilkan prediksi offline dari CSV menggunakan model yang sudah dilatih.
+
+    --at dapat menentukan waktu asal historis. Tanpa --at, gunakan batas
+    menit terakhir pada CSV agar menit mentah yang masih parsial tidak dipakai."""
     artifact = load_model(args.model)
     raw = clean(pd.read_csv(args.csv), artifact['device'])
     if raw.empty:
         raise ValueError('No usable rows for model device')
     minutes = minute_data(raw)
-    # Final raw minute may be partial. Only use completed clock minutes.
+    # Menit terakhir CSV mungkin belum selesai; ambil batas menit sebelumnya.
     origin = pd.Timestamp(args.at) if args.at else raw.index.max().floor('min')
     if origin.tzinfo is None:
         raise ValueError('--at must include a timezone, for example 2026-11-06T19:40:00Z')
@@ -223,6 +291,11 @@ def forecast_csv(args):
 
 
 def serve(args):
+    """Mengumpulkan sensor melalui MQTT dan menerbitkan prediksi setiap menit.
+
+    Waktu penerimaan pesan di komputer dipakai sebagai waktu sampel.
+    Riwayat dikosongkan setelah tersambung kembali, sehingga layanan perlu
+    mengumpulkan ulang 30 menit lengkap sebelum dapat memprediksi."""
     import paho.mqtt.client as mqtt
 
     artifact = load_model(args.model)
@@ -232,6 +305,8 @@ def serve(args):
         LOG.warning('Artifact lacks some ML candidates; retrain to publish all nine forecasts')
     topic_fields = {f'{root}/sensor/{s}': s for s in SENSORS}
     samples = {s: [] for s in SENSORS}
+    # Callback MQTT dan loop prediksi berjalan di thread berbeda.
+    # Lock melindungi buffer agar tidak dibaca saat sedang diubah.
     lock = threading.Lock()
     client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2,
                          client_id=f"moisture-forecast-{artifact['device']}")
@@ -251,6 +326,7 @@ def serve(args):
         LOG.info('Connected; collecting 30 complete minutes of fresh sensor history')
 
     def on_message(client, userdata, message):
+        # Abaikan retained message karena bisa berisi nilai lama dari broker.
         if message.retain or message.topic not in topic_fields:
             return
         try:
@@ -273,6 +349,7 @@ def serve(args):
             origin = pd.Timestamp.now(tz='UTC').floor('min')
             if origin != last_origin:
                 last_origin = origin
+                # Salin buffer di dalam lock; perhitungan berikutnya memakai salinan.
                 with lock:
                     cutoff = origin - pd.Timedelta(minutes=HISTORY + 2)
                     for sensor in SENSORS:
@@ -281,7 +358,8 @@ def serve(args):
                 try:
                     if not all(snapshot.values()):
                         raise ValueError('Waiting for sensor messages')
-                    # Aggregate independent topic streams exactly as in CSV training.
+                    # Topik sensor datang terpisah; agregasikan tiap sensor dengan
+                    # aturan interval, batas validitas, dan minimum sampel yang sama.
                     columns = {}
                     for sensor, values in snapshot.items():
                         series = pd.Series([v for _, v in values],
@@ -294,9 +372,13 @@ def serve(args):
                             series = series.where(series >= 0)
                         resampler = series.resample('1min', closed='left', label='right')
                         columns[sensor] = resampler.mean().where(resampler.count() >= 3)
+                    # Bentuk tepat 30 menit; reindex menampakkan menit hilang sebagai NaN.
                     minutes = pd.DataFrame(columns).reindex(
                         pd.date_range(origin - pd.Timedelta(minutes=HISTORY - 1), origin, freq='1min'))
                     payload = predict(artifact, minutes, origin)
+                    # Terbitkan JSON hasil prediksi ke topik khusus prediksi moisture.
+                    # QoS 1 meminta konfirmasi broker; retain=False tidak menyimpan pesan
+                    # sebagai retained message. Ini bukan konfirmasi penerimaan konsumen.
                     info = client.publish(f'{root}/prediction/moisture', json.dumps(payload), qos=1, retain=False)
                     info.wait_for_publish(timeout=10)
                     if not info.is_published():
@@ -308,11 +390,16 @@ def serve(args):
     except KeyboardInterrupt:
         LOG.info('Stopping')
     finally:
+        # Tutup koneksi dan thread jaringan juga ketika layanan dihentikan.
         client.disconnect()
         client.loop_stop()
 
 
 def main():
+    """Membaca pilihan terminal dan menjalankan mode train, predict, atau serve.
+
+    set_defaults menyimpan fungsi tujuan pada args.func; pemanggilan
+    args.func(args) kemudian menjalankan fungsi sesuai subperintah."""
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest='command', required=True)
     training = sub.add_parser('train')
@@ -337,5 +424,6 @@ def main():
     args.func(args)
 
 
+# Jalankan CLI hanya saat berkas dieksekusi langsung, bukan saat diimpor.
 if __name__ == '__main__':
     main()
