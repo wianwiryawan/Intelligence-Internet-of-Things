@@ -43,7 +43,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 390,
-        "y": 340,
+        "y": 300,
         "wires": [
             [
                 "bd375968718544b1",
@@ -102,7 +102,7 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 340,
+        "y": 300,
         "wires": [
             [
                 "13ad8b140a566589",
@@ -124,7 +124,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1100,
-        "y": 340,
+        "y": 300,
         "wires": []
     },
     {
@@ -140,8 +140,8 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 390,
-        "y": 700,
+        "x": 400,
+        "y": 580,
         "wires": [
             [
                 "0e95a1f4f83d307e",
@@ -162,8 +162,8 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 370,
-        "y": 880,
+        "x": 380,
+        "y": 720,
         "wires": [
             [
                 "3063b6a51d916c10",
@@ -184,8 +184,8 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 370,
-        "y": 1060,
+        "x": 380,
+        "y": 860,
         "wires": [
             [
                 "411b7d614d7c350f",
@@ -206,7 +206,7 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 700,
+        "y": 580,
         "wires": [
             [
                 "6da1d20355d66e3b",
@@ -228,7 +228,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 700,
+        "y": 580,
         "wires": []
     },
     {
@@ -244,7 +244,7 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 880,
+        "y": 720,
         "wires": [
             [
                 "539817f481ccc698",
@@ -265,7 +265,7 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 1060,
+        "y": 860,
         "wires": [
             [
                 "02e922a87c7e9681",
@@ -287,7 +287,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 880,
+        "y": 720,
         "wires": []
     },
     {
@@ -304,7 +304,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1090,
-        "y": 1060,
+        "y": 860,
         "wires": []
     },
     {
@@ -321,7 +321,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 390,
-        "y": 520,
+        "y": 440,
         "wires": [
             [
                 "0bbdfd3aef0fc633",
@@ -342,7 +342,7 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 520,
+        "y": 440,
         "wires": [
             [
                 "bd66e0962af200e4",
@@ -364,184 +364,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1100,
-        "y": 520,
-        "wires": []
-    },
-    {
-        "id": "927e5b6d2ba20879",
-        "type": "mqtt out",
-        "z": "a7fd0d8f86ef3876",
-        "name": "",
-        "topic": "/smartplant/esp32-01/command/relay/1/1",
-        "qos": "2",
-        "retain": "",
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "323cb69482501dbf",
-        "x": 760,
-        "y": 1500,
-        "wires": []
-    },
-    {
-        "id": "78d0b8fc9705576b",
-        "type": "debug",
-        "z": "a7fd0d8f86ef3876",
-        "name": "debug 3",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 660,
-        "y": 1560,
-        "wires": []
-    },
-    {
-        "id": "b168d9b27cf59281",
-        "type": "mqtt out",
-        "z": "a7fd0d8f86ef3876",
-        "name": "",
-        "topic": "/smartplant/esp32-01/command/relay/1/2",
-        "qos": "2",
-        "retain": "",
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "323cb69482501dbf",
-        "x": 760,
-        "y": 1620,
-        "wires": []
-    },
-    {
-        "id": "3cd4709b1c8e3295",
-        "type": "debug",
-        "z": "a7fd0d8f86ef3876",
-        "name": "debug 4",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 660,
-        "y": 1680,
-        "wires": []
-    },
-    {
-        "id": "ed3cb0c64e6c12b9",
-        "type": "mqtt out",
-        "z": "a7fd0d8f86ef3876",
-        "name": "",
-        "topic": "/smartplant/esp32-01/command/relay/2/1",
-        "qos": "2",
-        "retain": "",
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "323cb69482501dbf",
-        "x": 760,
-        "y": 1740,
-        "wires": []
-    },
-    {
-        "id": "2963c7abcc20253c",
-        "type": "debug",
-        "z": "a7fd0d8f86ef3876",
-        "name": "debug 5",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 660,
-        "y": 1800,
-        "wires": []
-    },
-    {
-        "id": "95fd1409f9c18007",
-        "type": "mqtt out",
-        "z": "a7fd0d8f86ef3876",
-        "d": true,
-        "name": "",
-        "topic": "/smartplant/esp32-01/command/flow/manual-control",
-        "qos": "2",
-        "retain": "",
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "323cb69482501dbf",
-        "x": 790,
-        "y": 1380,
-        "wires": []
-    },
-    {
-        "id": "514cfc80fe87f402",
-        "type": "mqtt out",
-        "z": "a7fd0d8f86ef3876",
-        "name": "",
-        "topic": "/smartplant/esp32-01/command/relay/2/2",
-        "qos": "2",
-        "retain": "",
-        "respTopic": "",
-        "contentType": "",
-        "userProps": "",
-        "correl": "",
-        "expiry": "",
-        "broker": "323cb69482501dbf",
-        "x": 760,
-        "y": 1860,
-        "wires": []
-    },
-    {
-        "id": "1ae3de97f1dffb29",
-        "type": "debug",
-        "z": "a7fd0d8f86ef3876",
-        "name": "debug 6",
-        "active": false,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 660,
-        "y": 1920,
-        "wires": []
-    },
-    {
-        "id": "077c381f25028383",
-        "type": "debug",
-        "z": "a7fd0d8f86ef3876",
-        "d": true,
-        "name": "debug 7",
-        "active": true,
-        "tosidebar": true,
-        "console": false,
-        "tostatus": false,
-        "complete": "payload",
-        "targetType": "msg",
-        "statusVal": "",
-        "statusType": "auto",
-        "x": 660,
-        "y": 1440,
+        "y": 440,
         "wires": []
     },
     {
@@ -557,8 +380,8 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 370,
-        "y": 2000,
+        "x": 1670,
+        "y": 160,
         "wires": [
             [
                 "92bf32990a397242",
@@ -579,8 +402,8 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 370,
-        "y": 2120,
+        "x": 1670,
+        "y": 280,
         "wires": [
             [
                 "53bb278d638dc387",
@@ -601,8 +424,8 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 360,
-        "y": 2240,
+        "x": 1660,
+        "y": 400,
         "wires": [
             [
                 "45a5337dda0c2b27",
@@ -623,8 +446,8 @@
         "rap": true,
         "rh": 0,
         "inputs": 0,
-        "x": 360,
-        "y": 2360,
+        "x": 1660,
+        "y": 520,
         "wires": [
             [
                 "738cb1299d0217ff",
@@ -665,7 +488,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1190,
-        "y": 400,
+        "y": 360,
         "wires": []
     },
     {
@@ -683,7 +506,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1200,
-        "y": 760,
+        "y": 640,
         "wires": []
     },
     {
@@ -701,7 +524,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1190,
-        "y": 940,
+        "y": 780,
         "wires": []
     },
     {
@@ -719,7 +542,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1190,
-        "y": 1120,
+        "y": 920,
         "wires": []
     },
     {
@@ -737,199 +560,8 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1190,
-        "y": 580,
+        "y": 500,
         "wires": []
-    },
-    {
-        "id": "d606e8406c85c4d1",
-        "type": "ui-button",
-        "z": "a7fd0d8f86ef3876",
-        "group": "6fd1287c5957b6a9",
-        "name": "Pompa Air",
-        "label": "Pompa Air",
-        "order": 1,
-        "width": 0,
-        "height": 0,
-        "emulateClick": false,
-        "tooltip": "",
-        "color": "",
-        "bgcolor": "",
-        "className": "",
-        "icon": "",
-        "iconPosition": "left",
-        "payload": "1",
-        "payloadType": "str",
-        "topic": "topic",
-        "topicType": "msg",
-        "buttonColor": "",
-        "textColor": "",
-        "iconColor": "",
-        "enableClick": true,
-        "enablePointerdown": false,
-        "pointerdownPayload": "",
-        "pointerdownPayloadType": "str",
-        "enablePointerup": false,
-        "pointerupPayload": "",
-        "pointerupPayloadType": "str",
-        "x": 310,
-        "y": 1500,
-        "wires": [
-            [
-                "927e5b6d2ba20879",
-                "78d0b8fc9705576b"
-            ]
-        ]
-    },
-    {
-        "id": "25864394ae7119a7",
-        "type": "ui-button",
-        "z": "a7fd0d8f86ef3876",
-        "group": "6fd1287c5957b6a9",
-        "name": "Water Mist",
-        "label": "Water Mist",
-        "order": 2,
-        "width": 0,
-        "height": 0,
-        "emulateClick": false,
-        "tooltip": "",
-        "color": "",
-        "bgcolor": "",
-        "className": "",
-        "icon": "",
-        "iconPosition": "left",
-        "payload": "1",
-        "payloadType": "str",
-        "topic": "topic",
-        "topicType": "msg",
-        "buttonColor": "",
-        "textColor": "",
-        "iconColor": "",
-        "enableClick": true,
-        "enablePointerdown": false,
-        "pointerdownPayload": "",
-        "pointerdownPayloadType": "str",
-        "enablePointerup": false,
-        "pointerupPayload": "",
-        "pointerupPayloadType": "str",
-        "x": 310,
-        "y": 1620,
-        "wires": [
-            [
-                "b168d9b27cf59281",
-                "3cd4709b1c8e3295"
-            ]
-        ]
-    },
-    {
-        "id": "37182c4ee6973b95",
-        "type": "ui-button",
-        "z": "a7fd0d8f86ef3876",
-        "group": "6fd1287c5957b6a9",
-        "name": "Fan",
-        "label": "Fan",
-        "order": 3,
-        "width": 0,
-        "height": 0,
-        "emulateClick": false,
-        "tooltip": "",
-        "color": "",
-        "bgcolor": "",
-        "className": "",
-        "icon": "",
-        "iconPosition": "left",
-        "payload": "1",
-        "payloadType": "str",
-        "topic": "topic",
-        "topicType": "msg",
-        "buttonColor": "",
-        "textColor": "",
-        "iconColor": "",
-        "enableClick": true,
-        "enablePointerdown": false,
-        "pointerdownPayload": "",
-        "pointerdownPayloadType": "str",
-        "enablePointerup": false,
-        "pointerupPayload": "",
-        "pointerupPayloadType": "str",
-        "x": 290,
-        "y": 1860,
-        "wires": [
-            [
-                "514cfc80fe87f402",
-                "1ae3de97f1dffb29"
-            ]
-        ]
-    },
-    {
-        "id": "9b3fa9d48c891dbb",
-        "type": "ui-switch",
-        "z": "a7fd0d8f86ef3876",
-        "name": "LED",
-        "label": "LED",
-        "group": "6fd1287c5957b6a9",
-        "order": 5,
-        "width": 0,
-        "height": 0,
-        "passthru": false,
-        "decouple": false,
-        "topic": "topic",
-        "topicType": "msg",
-        "style": "",
-        "className": "",
-        "layout": "row-spread",
-        "clickableArea": "switch",
-        "onvalue": "1",
-        "onvalueType": "str",
-        "onicon": "",
-        "oncolor": "",
-        "offvalue": "0",
-        "offvalueType": "str",
-        "officon": "",
-        "offcolor": "",
-        "x": 290,
-        "y": 1740,
-        "wires": [
-            [
-                "ed3cb0c64e6c12b9",
-                "2963c7abcc20253c"
-            ]
-        ]
-    },
-    {
-        "id": "1edb6c1fa56d3c5f",
-        "type": "ui-switch",
-        "z": "a7fd0d8f86ef3876",
-        "d": true,
-        "name": "Aktifkan Kontrol Manual",
-        "label": "Aktifkan Kontrol Manual",
-        "group": "6fd1287c5957b6a9",
-        "order": 4,
-        "width": 0,
-        "height": 0,
-        "passthru": false,
-        "decouple": false,
-        "topic": "topic",
-        "topicType": "msg",
-        "style": "",
-        "className": "",
-        "layout": "row-spread",
-        "clickableArea": "switch",
-        "onvalue": "true",
-        "onvalueType": "bool",
-        "onicon": "",
-        "oncolor": "",
-        "offvalue": "false",
-        "offvalueType": "bool",
-        "officon": "",
-        "offcolor": "",
-        "x": 350,
-        "y": 1380,
-        "wires": [
-            [
-                "95fd1409f9c18007",
-                "077c381f25028383"
-            ]
-        ]
     },
     {
         "id": "be98be4441a1ccf6",
@@ -951,8 +583,8 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 830,
-        "y": 2060,
+        "x": 2130,
+        "y": 220,
         "wires": []
     },
     {
@@ -975,8 +607,8 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 830,
-        "y": 2180,
+        "x": 2130,
+        "y": 340,
         "wires": []
     },
     {
@@ -999,8 +631,8 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 810,
-        "y": 2300,
+        "x": 2110,
+        "y": 460,
         "wires": []
     },
     {
@@ -1023,14 +655,15 @@
         "className": "",
         "value": "payload",
         "valueType": "msg",
-        "x": 810,
-        "y": 2420,
+        "x": 2110,
+        "y": 580,
         "wires": []
     },
     {
         "id": "73f67a3c269cb7a7",
         "type": "ui-gauge",
         "z": "a7fd0d8f86ef3876",
+        "d": true,
         "name": "Temperature",
         "group": "e26cb6161f8905ac",
         "order": 1,
@@ -1085,6 +718,7 @@
         "id": "40f346355c13b601",
         "type": "ui-gauge",
         "z": "a7fd0d8f86ef3876",
+        "d": true,
         "name": "Kelembaban Udara",
         "group": "e26cb6161f8905ac",
         "order": 2,
@@ -1130,7 +764,7 @@
         "styleGlow": false,
         "className": "",
         "x": 730,
-        "y": 400,
+        "y": 360,
         "wires": [
             []
         ]
@@ -1139,6 +773,7 @@
         "id": "a64b85525212b45e",
         "type": "ui-gauge",
         "z": "a7fd0d8f86ef3876",
+        "d": true,
         "name": "Kelembaban Tanah",
         "group": "f387fd9c376305b3",
         "order": 1,
@@ -1184,7 +819,7 @@
         "styleGlow": false,
         "className": "",
         "x": 730,
-        "y": 580,
+        "y": 500,
         "wires": [
             []
         ]
@@ -1193,6 +828,7 @@
         "id": "049f27412ae6392a",
         "type": "ui-gauge",
         "z": "a7fd0d8f86ef3876",
+        "d": true,
         "name": "Level Air",
         "group": "61b93d2485be5f8a",
         "order": 1,
@@ -1232,7 +868,7 @@
         "styleGlow": false,
         "className": "",
         "x": 700,
-        "y": 760,
+        "y": 640,
         "wires": [
             []
         ]
@@ -1241,6 +877,7 @@
         "id": "81b1e66694cde220",
         "type": "ui-gauge",
         "z": "a7fd0d8f86ef3876",
+        "d": true,
         "name": "Intensitas Cahaya",
         "group": "e26cb6161f8905ac",
         "order": 3,
@@ -1286,7 +923,7 @@
         "styleGlow": false,
         "className": "",
         "x": 730,
-        "y": 940,
+        "y": 780,
         "wires": [
             []
         ]
@@ -1295,6 +932,7 @@
         "id": "ef63760742c87eca",
         "type": "ui-gauge",
         "z": "a7fd0d8f86ef3876",
+        "d": true,
         "name": "Parts Per Million",
         "group": "61b93d2485be5f8a",
         "order": 2,
@@ -1340,7 +978,7 @@
         "styleGlow": false,
         "className": "",
         "x": 720,
-        "y": 1120,
+        "y": 920,
         "wires": [
             []
         ]
@@ -1357,8 +995,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 880,
-        "y": 2000,
+        "x": 2180,
+        "y": 160,
         "wires": [
             [
                 "0a0763d3e8a5e48b"
@@ -1377,8 +1015,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 880,
-        "y": 2120,
+        "x": 2180,
+        "y": 280,
         "wires": [
             [
                 "e5aecd422c98807d"
@@ -1397,8 +1035,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 880,
-        "y": 2240,
+        "x": 2180,
+        "y": 400,
         "wires": [
             [
                 "8f1669440637336c"
@@ -1417,8 +1055,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 880,
-        "y": 2360,
+        "x": 2180,
+        "y": 520,
         "wires": [
             [
                 "4bc0e92587ccf0b9"
@@ -1455,8 +1093,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 640,
-        "y": 2060,
+        "x": 1940,
+        "y": 220,
         "wires": [
             [
                 "be98be4441a1ccf6"
@@ -1493,8 +1131,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 640,
-        "y": 2180,
+        "x": 1940,
+        "y": 340,
         "wires": [
             [
                 "a7cc98c362aa4de5"
@@ -1531,8 +1169,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 640,
-        "y": 2300,
+        "x": 1940,
+        "y": 460,
         "wires": [
             [
                 "4e1764fcf9bad809"
@@ -1569,8 +1207,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 640,
-        "y": 2420,
+        "x": 1940,
+        "y": 580,
         "wires": [
             [
                 "5c52285ba2cc1a98"
@@ -1591,8 +1229,8 @@
         "retentionPolicyV18Flux": "",
         "org": "Student",
         "bucket": "SmartPlantIoT",
-        "x": 1250,
-        "y": 2000,
+        "x": 2550,
+        "y": 160,
         "wires": []
     },
     {
@@ -1609,8 +1247,8 @@
         "retentionPolicyV18Flux": "",
         "org": "Student",
         "bucket": "SmartPlantIoT",
-        "x": 1250,
-        "y": 2120,
+        "x": 2550,
+        "y": 280,
         "wires": []
     },
     {
@@ -1627,8 +1265,8 @@
         "retentionPolicyV18Flux": "",
         "org": "Student",
         "bucket": "SmartPlantIoT",
-        "x": 1250,
-        "y": 2240,
+        "x": 2550,
+        "y": 400,
         "wires": []
     },
     {
@@ -1645,8 +1283,8 @@
         "retentionPolicyV18Flux": "",
         "org": "Student",
         "bucket": "SmartPlantIoT",
-        "x": 1250,
-        "y": 2360,
+        "x": 2550,
+        "y": 520,
         "wires": []
     },
     {
@@ -1663,7 +1301,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 350,
-        "y": 1220,
+        "y": 1000,
         "wires": [
             [
                 "3766a640d331978e"
@@ -1684,7 +1322,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1070,
-        "y": 1220,
+        "y": 1000,
         "wires": []
     },
     {
@@ -1700,7 +1338,7 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 1220,
+        "y": 1000,
         "wires": [
             [
                 "41abecb44d9d06a9",
@@ -1723,7 +1361,439 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1170,
-        "y": 1300,
+        "y": 1080,
+        "wires": []
+    },
+    {
+        "id": "81b40d34a48d55f9",
+        "type": "mqtt in",
+        "z": "a7fd0d8f86ef3876",
+        "name": "",
+        "topic": "/smartplant/esp32-01/prediction/moisture",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "323cb69482501dbf",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 400,
+        "y": 1160,
+        "wires": [
+            [
+                "4b3dfe49727aea9a",
+                "d59585ef20f9f93f"
+            ]
+        ]
+    },
+    {
+        "id": "d8a9196c17035166",
+        "type": "debug",
+        "z": "a7fd0d8f86ef3876",
+        "name": "Output",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1070,
+        "y": 1160,
+        "wires": []
+    },
+    {
+        "id": "4b3dfe49727aea9a",
+        "type": "function",
+        "z": "a7fd0d8f86ef3876",
+        "name": "Transfer to InfluxDB Format",
+        "func": "const data = msg.payload;\nconst originMs = Date.parse(data?.origin_utc);\nif (!data?.device || !Number.isFinite(originMs) ||\n    !Array.isArray(data.model_forecasts) || data.model_forecasts.length === 0) {\n    node.error(\"Missing model_forecasts or invalid origin; restart the updated Python service\", msg);\n    return null;\n}\n\nconst points = [];\nfor (const forecast of data.model_forecasts) {\n    const targetMs = Date.parse(forecast.target_time_utc);\n    if (![\"5m\", \"10m\", \"15m\"].includes(forecast.horizon) ||\n        ![\"persistence\", \"random_forest\", \"gradient_boosting\"].includes(forecast.model) ||\n        typeof forecast.moisture !== \"number\" || !Number.isFinite(forecast.moisture) ||\n        !Number.isFinite(targetMs)) {\n        node.error(\"Invalid model forecast\", msg);\n        return null;\n    }\n    points.push({\n        measurement: \"moisture_forecast\",\n        fields: {\n            predicted_moisture: forecast.moisture,\n            origin_epoch_ms: originMs\n        },\n        tags: {\n            device: String(data.device),\n            horizon: forecast.horizon,\n            model: forecast.model\n        },\n        timestamp: new Date(targetMs)\n    });\n}\nmsg.payload = points;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 1160,
+        "wires": [
+            [
+                "d8a9196c17035166",
+                "698d4d0e6eab1513"
+            ]
+        ]
+    },
+    {
+        "id": "698d4d0e6eab1513",
+        "type": "influxdb batch",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "c53397d839012cf0",
+        "precision": "",
+        "retentionPolicy": "",
+        "name": "Batch Moisture Prediction",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "Student",
+        "bucket": "SmartPlantIoT",
+        "x": 1130,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "a1c9bfb201d11d33",
+        "type": "function",
+        "z": "a7fd0d8f86ef3876",
+        "name": "Transfer to InfluxDB Format (backup)",
+        "func": "const data = msg.payload;\n\nif (!data?.device || !data?.forecasts) {\n    node.error(\"Invalid prediction payload\", msg);\n    return null;\n}\n\nconst originMs = Date.parse(data.origin_utc);\n\nif (!Number.isFinite(originMs)) {\n    node.error(\"Invalid forecast origin timestamp\", msg);\n    return null;\n}\n\nconst points = [];\n\nfor (const horizon of [\"5m\", \"10m\", \"15m\"]) {\n    const forecast = data.forecasts[horizon];\n    const moisture = forecast?.moisture;\n    const targetMs = Date.parse(forecast?.target_time_utc);\n\n    if (\n        typeof moisture !== \"number\" ||\n        !Number.isFinite(moisture) ||\n        !Number.isFinite(targetMs)\n    ) {\n        node.error(`Invalid forecast for ${horizon}`, msg);\n        return null;\n    }\n\n    const modelKey = horizon.replace(\"m\", \"\");\n\n    points.push({\n        measurement: \"moisture_forecast\",\n\n        fields: {\n            predicted_moisture: moisture,\n            origin_epoch_ms: originMs\n        },\n\n        tags: {\n            device: String(data.device),\n            horizon: horizon,\n            model: data.selected_models?.[modelKey] ?? \"unknown\"\n        },\n\n        // Store at the time being predicted.\n        timestamp: new Date(targetMs)\n    });\n}\n\nmsg.payload = points;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 1220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "99ab69f157286c27",
+        "type": "debug",
+        "z": "a7fd0d8f86ef3876",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1080,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "d59585ef20f9f93f",
+        "type": "function",
+        "z": "a7fd0d8f86ef3876",
+        "name": "Gradient Boosting Policy Preview",
+        "func": "const MODEL = \"gradient_boosting\";\nconst HORIZON = \"10m\";\nconst THRESHOLD = 60;       // Existing firmware threshold; validate experimentally.\nconst UPPER_LIMIT = 70;     // Provisional guard against watering already-wet soil.\nconst MAX_ORIGIN_AGE_MS = 90000;\nconst data = msg.payload;\nconst now = Date.now();\n\nfunction finish(decision, reason, forecast) {\n    msg.topic = \"smartplant/policy/preview\";\n    msg.payload = {\n        device: data && data.device,\n        mode: \"preview\",\n        model: MODEL,\n        horizon: HORIZON,\n        decision: decision,\n        reason: reason,\n        threshold: THRESHOLD,\n        upper_moisture_limit: UPPER_LIMIT,\n        current_moisture: data && data.current_minute_moisture,\n        predicted_moisture: forecast ? forecast.moisture : null,\n        origin_utc: data && data.origin_utc,\n        target_time_utc: forecast ? forecast.target_time_utc : null,\n        evaluated_at_utc: new Date(now).toISOString(),\n        actuator_command_sent: false\n    };\n    node.status({fill: decision === \"would_water\" ? \"yellow\" :\n                       decision === \"reject\" ? \"red\" : \"green\",\n                 shape: \"dot\", text: decision + \": \" + reason});\n    return msg;\n}\n\nif (!data || data.device !== \"esp32-01\" || !Array.isArray(data.model_forecasts)) {\n    return finish(\"reject\", \"invalid_payload_or_device\");\n}\nconst matches = data.model_forecasts.filter(function (f) {\n    return f && f.model === MODEL && f.horizon === HORIZON;\n});\nif (matches.length !== 1) {\n    return finish(\"reject\", \"missing_or_duplicate_gradient_forecast\");\n}\nconst forecast = matches[0];\nconst origin = Date.parse(data.origin_utc);\nconst target = Date.parse(forecast.target_time_utc);\nif (!Number.isFinite(origin) || now - origin > MAX_ORIGIN_AGE_MS || origin > now) {\n    return finish(\"reject\", \"stale_or_invalid_origin\", forecast);\n}\nif (!Number.isFinite(target) || target - origin !== 10 * 60000) {\n    return finish(\"reject\", \"invalid_target_time\", forecast);\n}\nconst current = data.current_minute_moisture;\nconst predicted = forecast.moisture;\nif (typeof current !== \"number\" || !Number.isFinite(current) || current < 0 || current > 100 ||\n    typeof predicted !== \"number\" || !Number.isFinite(predicted) || predicted < 0 || predicted > 100) {\n    return finish(\"reject\", \"invalid_moisture\", forecast);\n}\nif (current >= UPPER_LIMIT) {\n    return finish(\"hold\", \"current_moisture_at_upper_limit\", forecast);\n}\nif (predicted <= THRESHOLD) {\n    return finish(\"would_water\", \"forecast_at_or_below_threshold\", forecast);\n}\nreturn finish(\"hold\", \"forecast_above_threshold\", forecast);",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 1240,
+        "wires": [
+            [
+                "99ab69f157286c27",
+                "4e58a3427f178d2c",
+                "07344d2372e03967"
+            ]
+        ]
+    },
+    {
+        "id": "7e8643931b27f98f",
+        "type": "ui-dropdown",
+        "z": "a7fd0d8f86ef3876",
+        "group": "6fd1287c5957b6a9",
+        "name": "Mode",
+        "label": "Select Option:",
+        "tooltip": "",
+        "order": 1,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "multiple": false,
+        "chips": false,
+        "clearable": false,
+        "options": [
+            {
+                "label": "Off",
+                "value": "off",
+                "type": "str"
+            },
+            {
+                "label": "Rule Based",
+                "value": "rule_based",
+                "type": "str"
+            },
+            {
+                "label": "Predictive",
+                "value": "predictive",
+                "type": "str"
+            }
+        ],
+        "payload": "",
+        "topic": "payload",
+        "topicType": "msg",
+        "className": "",
+        "typeIsComboBox": true,
+        "msgTrigger": "onChange",
+        "x": 290,
+        "y": 1600,
+        "wires": [
+            [
+                "bee5e5fd823e78d9",
+                "2ce2dfefb6af150d"
+            ]
+        ]
+    },
+    {
+        "id": "bee5e5fd823e78d9",
+        "type": "debug",
+        "z": "a7fd0d8f86ef3876",
+        "name": "debug 2",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 520,
+        "y": 1600,
+        "wires": []
+    },
+    {
+        "id": "2ce2dfefb6af150d",
+        "type": "mqtt out",
+        "z": "a7fd0d8f86ef3876",
+        "name": "/smartplant/esp32-01/control/mode",
+        "topic": "/smartplant/esp32-01/control/mode",
+        "qos": "0",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "323cb69482501dbf",
+        "x": 610,
+        "y": 1680,
+        "wires": []
+    },
+    {
+        "id": "717b09b70e747074",
+        "type": "mqtt in",
+        "z": "a7fd0d8f86ef3876",
+        "name": "/smartplant/esp32-01/status/control",
+        "topic": "/smartplant/esp32-01/status/control",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "323cb69482501dbf",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 380,
+        "y": 1340,
+        "wires": [
+            [
+                "1e6fda6795125b08"
+            ]
+        ]
+    },
+    {
+        "id": "1e6fda6795125b08",
+        "type": "json",
+        "z": "a7fd0d8f86ef3876",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 690,
+        "y": 1340,
+        "wires": [
+            [
+                "8e422978ce287b05",
+                "4e58a3427f178d2c"
+            ]
+        ]
+    },
+    {
+        "id": "8e422978ce287b05",
+        "type": "debug",
+        "z": "a7fd0d8f86ef3876",
+        "name": "debug 3",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "4e58a3427f178d2c",
+        "type": "function",
+        "z": "a7fd0d8f86ef3876",
+        "name": "Pump Command",
+        "func": "// Allow real pump requests when ALL checks below pass.\n// false = observation only; true = allow command transmission.\nconst ENABLE_COMMANDS = true;\n\n// ESP32 publishes its current mode, readiness, and session here.\nconst STATUS_TOPIC = \"/smartplant/esp32-01/status/control\";\n\n// Node-RED publishes pump requests here for the ESP32.\nconst COMMAND_TOPIC = \"/smartplant/esp32-01/control/pump\";\n\n// Current time as milliseconds since the Unix epoch.\n// The computer running Node-RED needs an accurate clock.\nconst now = Date.now();\n\n// Incoming payload must already be a parsed JavaScript object.\nconst data = msg.payload;\n\n\n// ── 1. Receive and cache ESP32 status ──────────────────────────\n\n// This Function receives two kinds of messages:\n// - ESP32 status messages\n// - Decisions from Gradient Boosting Policy Preview\n//\n// Identify status messages by their MQTT topic.\nif (msg.topic === STATUS_TOPIC) {\n\n    // Ignore retained status delivered by the broker.\n    // It may describe an old ESP32 session or operating condition.\n    if (msg.retain) {\n        return [\n            null,\n            {payload: {result: \"blocked\", reason: \"retained_status\"}}\n        ];\n    }\n\n    // Require a non-empty session identifier from the ESP32.\n    // The firmware changes its session after reconnect/mode changes.\n    if (!data || typeof data.session !== \"string\" || !data.session) {\n        return null;\n    }\n\n    // Save the latest status and its local receipt time.\n    // Node context retains values between messages for this Function.\n    context.set(\"pump_status\", {\n        received: now,\n        data: data\n    });\n\n    // A status update only refreshes the cache.\n    // It does not trigger a watering request.\n    return null;\n}\n\n\n// ── 2. Helper for reporting blocked requests ───────────────────\n\nfunction blocked(reason) {\n    // First output: null → no MQTT command.\n    // Second output: diagnostic object → Debug.\n    return [\n        null,\n        {\n            payload: {\n                result: \"blocked\",\n                reason: reason,\n                evaluated_at_utc: new Date(now).toISOString()\n            }\n        }\n    ];\n}\n\n\n// ── 3. Require the intended policy decision ────────────────────\n\n// Accept only the expected device, model, horizon, and decision.\n//\n// \"preview\" describes the upstream policy message format.\n// It is separate from the ESP32's operating mode, checked later.\n//\n// Any \"hold\" or \"reject\" decision stops here.\nif (\n    !data ||\n    data.device !== \"esp32-01\" ||\n    data.mode !== \"preview\" ||\n    data.model !== \"gradient_boosting\" ||\n    data.horizon !== \"10m\" ||\n    data.decision !== \"would_water\"\n) {\n    return blocked(\"no_qualifying_decision\");\n}\n\n\n// ── 4. Check forecast timestamps ──────────────────────────────\n\n// Convert ISO timestamps into epoch milliseconds.\nconst origin = Date.parse(data.origin_utc);\nconst target = Date.parse(data.target_time_utc);\n\n// Require:\n// - A valid forecast origin.\n// - Origin is not in the future.\n// - Forecast origin is no more than 90 seconds old.\n// - Target is exactly 10 minutes after origin.\n//\n// 90,000 ms = 90 seconds.\n// 600,000 ms = 10 minutes.\nif (\n    !Number.isFinite(origin) ||\n    origin > now ||\n    now - origin > 90000 ||\n    target - origin !== 600000\n) {\n    return blocked(\"stale_or_invalid_forecast\");\n}\n\n\n// ── 5. Check moisture conditions independently ────────────────\n\n// Recheck the numbers even though the preview policy checked them.\n//\n// Predicted moisture must be between 0% and 60%, inclusive.\n// Current minute-average moisture must be between 0% and 70%,\n// excluding 70%.\n//\n// The ESP32 also checks its own local sensor readings later.\nif (\n    typeof data.predicted_moisture !== \"number\" ||\n    !Number.isFinite(data.predicted_moisture) ||\n    data.predicted_moisture < 0 ||\n    data.predicted_moisture > 60 ||\n    typeof data.current_moisture !== \"number\" ||\n    !Number.isFinite(data.current_moisture) ||\n    data.current_moisture < 0 ||\n    data.current_moisture >= 70\n) {\n    return blocked(\"invalid_moisture\");\n}\n\n\n// ── 6. Require recent ESP32 status ─────────────────────────────\n\nconst cached = context.get(\"pump_status\");\n\n// Reject if no status has arrived, its receipt time is in the\n// future, or it was received more than 15 seconds ago.\n//\n// This checks receipt age; it is not a sensor timestamp check.\nif (\n    !cached ||\n    now - cached.received > 15000 ||\n    cached.received > now\n) {\n    return blocked(\"waiting_for_fresh_esp32_status\");\n}\n\nconst status = cached.data;\n\n// ESP32 must explicitly report:\n// - Predictive operating mode.\n// - Ready to accept a predictive request.\n// - Pump is OFF.\n// - No remaining cooldown.\n//\n// predictive_ready includes the firmware's readiness checks,\n// such as clock, sensor conditions, and timer availability.\nif (\n    status.mode !== \"predictive\" ||\n    status.predictive_ready !== true ||\n    status.pump_on !== false ||\n    status.cooldown_remaining_ms !== 0\n) {\n    return blocked(\"esp32_not_ready\");\n}\n\n\n// ── 7. Check the command enable switch ─────────────────────────\n\n// With commands disabled, diagnostics still run,\n// but no pump request can leave output 1.\nif (!ENABLE_COMMANDS) {\n    return blocked(\"observation_only_commands_disabled\");\n}\n\n\n// ── 8. Reject repeated forecasts and enforce local cooldown ───\n\nconst previous = context.get(\"last_pump_request\");\n\n// If a request was previously sent:\n// - Do not reuse its forecast origin or an older origin.\n// - Wait at least five minutes after that request.\n//\n// 300,000 ms = 5 minutes.\n//\n// This is Node-RED's additional cooldown.\n// ESP32 independently enforces its own cooldown.\nif (\n    previous &&\n    (\n        origin <= previous.origin ||\n        now - previous.sent < 300000\n    )\n) {\n    return blocked(\"duplicate_or_local_cooldown\");\n}\n\n\n// ── 9. Build the pump request ──────────────────────────────────\n\nconst command = {\n\n    // Identifies this request using ESP32 session + forecast origin.\n    command_id: status.session + \"-\" + origin,\n\n    // Binds the request to the ESP32's current control session.\n    session: status.session,\n\n    // Request one bounded pulse, not continuous operation.\n    action: \"pulse\",\n\n    // Requested pump ON time: 500 milliseconds = 0.5 seconds.\n    duration_ms: 500,\n\n    // Time this request was created.\n    issued_at_epoch_ms: now,\n\n    // ESP32 must reject it after 15 seconds.\n    // This expiry is separate from the 10-minute forecast horizon.\n    expires_at_epoch_ms: now + 15000,\n\n    // Original time from which the forecast was made.\n    origin_epoch_ms: origin,\n\n    // Record which prediction caused the request.\n    model: \"gradient_boosting\",\n    horizon: \"10m\",\n    predicted_moisture: data.predicted_moisture\n};\n\n\n// ── 10. Record the request before sending ──────────────────────\n\n// Start Node-RED's cooldown immediately.\n//\n// Even if MQTT delivery fails or ESP32 rejects the request,\n// Node-RED still waits five minutes before another request.\n// This deliberately avoids rapid retries.\ncontext.set(\"last_pump_request\", {\n    origin: origin,\n    sent: now\n});\n\n\n// ── 11. Send to the two Function outputs ───────────────────────\n\nreturn [\n    {\n        // OUTPUT 1 → MQTT out\n        topic: COMMAND_TOPIC,\n\n        // Convert the command object into JSON text for MQTT.\n        payload: JSON.stringify(command),\n\n        // QoS 0: delivery is not guaranteed.\n        qos: \"0\",\n\n        // Do not store this actuator command as a retained message.\n        retain: false\n    },\n    {\n        // OUTPUT 2 → Debug\n        payload: {\n            result: \"request_sent\",\n            command: command\n        }\n    }\n];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1110,
+        "y": 1340,
+        "wires": [
+            [
+                "0898ba3d1ed77af9"
+            ],
+            [
+                "9c5461aefc6b7760"
+            ]
+        ]
+    },
+    {
+        "id": "9c5461aefc6b7760",
+        "type": "debug",
+        "z": "a7fd0d8f86ef3876",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1360,
+        "y": 1420,
+        "wires": []
+    },
+    {
+        "id": "4bda52b90c8e606f",
+        "type": "mqtt in",
+        "z": "a7fd0d8f86ef3876",
+        "name": "/smartplant/esp32-01/status/pump-command",
+        "topic": "/smartplant/esp32-01/status/pump-command",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "323cb69482501dbf",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 410,
+        "y": 1500,
+        "wires": [
+            [
+                "71a013338e7d2b9b"
+            ]
+        ]
+    },
+    {
+        "id": "71a013338e7d2b9b",
+        "type": "json",
+        "z": "a7fd0d8f86ef3876",
+        "name": "",
+        "property": "payload",
+        "action": "",
+        "pretty": false,
+        "x": 690,
+        "y": 1500,
+        "wires": [
+            [
+                "a9b2999876e5a4cc"
+            ]
+        ]
+    },
+    {
+        "id": "a9b2999876e5a4cc",
+        "type": "debug",
+        "z": "a7fd0d8f86ef3876",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 880,
+        "y": 1500,
+        "wires": []
+    },
+    {
+        "id": "0898ba3d1ed77af9",
+        "type": "mqtt out",
+        "z": "a7fd0d8f86ef3876",
+        "name": "/smartplant/esp32-01/control/pump",
+        "topic": "/smartplant/esp32-01/control/pump",
+        "qos": "0",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "323cb69482501dbf",
+        "x": 1450,
+        "y": 1340,
+        "wires": []
+    },
+    {
+        "id": "07344d2372e03967",
+        "type": "function",
+        "z": "a7fd0d8f86ef3876",
+        "name": "Decision to InfluxDB",
+        "func": "// Node-RED Function: branch from Gradient Boosting Policy Preview -> this -> influxdb batch.\n// One output. Returns a NEW message; does not modify the control-policy message.\nconst data = msg.payload;\nif (!data || data.mode !== \"preview\" ||\n    ![\"would_water\", \"hold\", \"reject\"].includes(data.decision) ||\n    typeof data.reason !== \"string\") {\n    node.error(\"Decision logger requires a policy-preview object\", msg);\n    return null;\n}\nconst evaluated = Date.parse(data.evaluated_at_utc);\nif (!Number.isFinite(evaluated)) {\n    node.error(\"Decision has no valid evaluation time\", msg);\n    return null;\n}\nfunction finite(value) {\n    return typeof value === \"number\" && Number.isFinite(value);\n}\nfunction display(value) {\n    return finite(value) ? value.toFixed(2) : \"unavailable\";\n}\nconst explanations = {\n    forecast_at_or_below_threshold:\n        \"Forecast \" + display(data.predicted_moisture) + \"% <= threshold \" +\n        display(data.threshold) + \"%; current minute-average \" + display(data.current_moisture) +\n        \"% < upper limit \" + display(data.upper_moisture_limit) +\n        \"%. Policy qualifies for a watering request; actuator checks are separate.\",\n    forecast_above_threshold:\n        \"Forecast \" + display(data.predicted_moisture) + \"% > threshold \" +\n        display(data.threshold) + \"%. Policy holds watering.\",\n    current_moisture_at_upper_limit:\n        \"Current minute-average \" + display(data.current_moisture) + \"% >= upper limit \" +\n        display(data.upper_moisture_limit) + \"%. Policy holds watering.\",\n    invalid_payload_or_device: \"Payload is invalid or is not for the configured device.\",\n    missing_or_duplicate_gradient_forecast:\n        \"Exactly one Gradient Boosting forecast for the selected horizon is required.\",\n    stale_or_invalid_origin:\n        \"Forecast origin is invalid, in the future, or older than the policy's 90-second limit.\",\n    invalid_target_time: \"Target time is invalid or is not exactly 10 minutes after origin.\",\n    invalid_moisture: \"Current or predicted moisture is not a finite number in the range 0 to 100%.\"\n};\nconst fields = {\n    decision: data.decision,\n    reason_code: data.reason,\n    explanation: explanations[data.reason] || \"Unrecognized policy reason: \" + data.reason,\n    explanation_type: \"control_policy_rules\",\n    policy_version: \"gradient_10m_v1\",\n    control_mode: \"preview\",\n    // This records the POLICY stage; it does not describe later command delivery.\n    actuator_command_sent_at_policy_stage: false\n};\nfor (const name of [\"current_moisture\", \"predicted_moisture\", \"threshold\", \"upper_moisture_limit\"]) {\n    if (finite(data[name])) fields[name] = data[name];\n}\nfor (const pair of [[\"origin_utc\", \"origin_epoch_ms\"], [\"target_time_utc\", \"target_epoch_ms\"]]) {\n    const value = Date.parse(data[pair[0]]);\n    if (Number.isFinite(value)) fields[pair[1]] = value;\n}\n// Numeric value for a Grafana State timeline or count queries.\nfields.decision_code = {would_water: 1, hold: 0, reject: -1}[data.decision];\nreturn {payload: [{\n    measurement: \"moisture_policy_decision\",\n    tags: {\n        device: typeof data.device === \"string\" && data.device ? data.device : \"unknown\",\n        model: data.model || \"unknown\",\n        horizon: data.horizon || \"unknown\",\n        stage: \"policy\"\n    },\n    fields: fields,\n    // Decision time, NOT forecast target time: future actions have not happened yet.\n    timestamp: new Date(evaluated)\n}]};\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 1420,
+        "wires": [
+            [
+                "09b6f0cf53694992",
+                "dc624ed3170739f1"
+            ]
+        ]
+    },
+    {
+        "id": "09b6f0cf53694992",
+        "type": "debug",
+        "z": "a7fd0d8f86ef3876",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1360,
+        "y": 1540,
+        "wires": []
+    },
+    {
+        "id": "dc624ed3170739f1",
+        "type": "influxdb batch",
+        "z": "a7fd0d8f86ef3876",
+        "influxdb": "c53397d839012cf0",
+        "precision": "",
+        "retentionPolicy": "",
+        "name": "Batch Decision logs",
+        "database": "database",
+        "precisionV18FluxV20": "ms",
+        "retentionPolicyV18Flux": "",
+        "org": "Student",
+        "bucket": "SmartPlantIoT",
+        "x": 1400,
+        "y": 1480,
         "wires": []
     },
     {
@@ -1773,20 +1843,6 @@
         "rejectUnauthorized": true
     },
     {
-        "id": "6fd1287c5957b6a9",
-        "type": "ui-group",
-        "name": "Kontrol Manual",
-        "page": "de304870d854a21c",
-        "width": "3",
-        "height": 1,
-        "order": 2,
-        "showTitle": true,
-        "className": "",
-        "visible": "true",
-        "disabled": "false",
-        "groupType": "default"
-    },
-    {
         "id": "c4d3bad4551549fa",
         "type": "ui-group",
         "name": "Notifikasi",
@@ -1810,7 +1866,7 @@
         "order": 5,
         "showTitle": true,
         "className": "",
-        "visible": "true",
+        "visible": false,
         "disabled": "false",
         "groupType": "default"
     },
@@ -1824,7 +1880,7 @@
         "order": 3,
         "showTitle": true,
         "className": "",
-        "visible": "true",
+        "visible": false,
         "disabled": "false",
         "groupType": "default"
     },
@@ -1836,6 +1892,20 @@
         "width": "6",
         "height": 1,
         "order": 4,
+        "showTitle": true,
+        "className": "",
+        "visible": false,
+        "disabled": "false",
+        "groupType": "default"
+    },
+    {
+        "id": "6fd1287c5957b6a9",
+        "type": "ui-group",
+        "name": "Kontrol Pompa",
+        "page": "de304870d854a21c",
+        "width": "3",
+        "height": 1,
+        "order": 2,
         "showTitle": true,
         "className": "",
         "visible": "true",
@@ -1918,7 +1988,7 @@
         }
     },
     {
-        "id": "af22cac4caf21e76",
+        "id": "37bf51e37e52c5ef",
         "type": "global-config",
         "env": [],
         "modules": {
