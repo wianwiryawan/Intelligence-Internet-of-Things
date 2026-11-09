@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 import pandas as pd
 
-from forecast import SENSORS, features, minute_data, predict, supervised
+from Code.forecasting.forecast import SENSORS, features, minute_data, predict, supervised
 
 
 class ConstantModel:

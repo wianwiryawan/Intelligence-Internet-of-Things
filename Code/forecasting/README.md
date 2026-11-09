@@ -7,7 +7,7 @@ Python 3.10+ CLI for EDA, training, offline prediction, and live MQTT forecasts 
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe forecast.py train --csv "H:\File\MyGithub\MyNote\Master Of Computer Science\Inteligent Internet of Things (COMP8078041)\Final Project (AOL)\AOL_Dataset.csv"
+.\.venv\Scripts\python.exe forecast.py train --csv "<path-to-dataset>\<filename>.csv"
 .\.venv\Scripts\python.exe -m unittest -v
 ```
 
@@ -24,7 +24,7 @@ Actuator fields are deliberately excluded because sampled notifications may not 
 ## Offline forecast
 
 ```powershell
-.\.venv\Scripts\python.exe forecast.py predict --csv "H:\File\MyGithub\MyNote\Master Of Computer Science\Inteligent Internet of Things (COMP8078041)\Final Project (AOL)\AOL_Dataset.csv" --model outputs/model.joblib
+.\.venv\Scripts\python.exe forecast.py predict --csv "<path-to-dataset>\<filename>.csv" --model outputs/model.joblib
 ```
 
 Uses the latest completed clock minute in the CSV; fails clearly if there is insufficient recent history. It does not silently forecast from an older valid session. This is a forecast from the CSV's time, not necessarily from the current wall clock.
