@@ -1312,8 +1312,8 @@
         "id": "41abecb44d9d06a9",
         "type": "debug",
         "z": "a7fd0d8f86ef3876",
-        "name": "Output",
-        "active": false,
+        "name": "Output dataset",
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1321,7 +1321,7 @@
         "targetType": "msg",
         "statusVal": "",
         "statusType": "auto",
-        "x": 1070,
+        "x": 1100,
         "y": 1000,
         "wires": []
     },
@@ -1378,7 +1378,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 400,
-        "y": 1160,
+        "y": 1240,
         "wires": [
             [
                 "4b3dfe49727aea9a",
@@ -1400,7 +1400,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1070,
-        "y": 1160,
+        "y": 1240,
         "wires": []
     },
     {
@@ -1416,7 +1416,7 @@
         "finalize": "",
         "libs": [],
         "x": 760,
-        "y": 1160,
+        "y": 1240,
         "wires": [
             [
                 "d8a9196c17035166",
@@ -1438,7 +1438,7 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1130,
-        "y": 1220,
+        "y": 1300,
         "wires": []
     },
     {
@@ -1453,8 +1453,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 410,
-        "y": 1220,
+        "x": 390,
+        "y": 1300,
         "wires": [
             []
         ]
@@ -1472,7 +1472,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1080,
-        "y": 1280,
+        "y": 1360,
         "wires": []
     },
     {
@@ -1488,7 +1488,7 @@
         "finalize": "",
         "libs": [],
         "x": 780,
-        "y": 1240,
+        "y": 1320,
         "wires": [
             [
                 "99ab69f157286c27",
@@ -1536,7 +1536,7 @@
         "typeIsComboBox": true,
         "msgTrigger": "onChange",
         "x": 290,
-        "y": 1600,
+        "y": 1680,
         "wires": [
             [
                 "bee5e5fd823e78d9",
@@ -1557,7 +1557,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 520,
-        "y": 1600,
+        "y": 1680,
         "wires": []
     },
     {
@@ -1575,7 +1575,7 @@
         "expiry": "",
         "broker": "323cb69482501dbf",
         "x": 610,
-        "y": 1680,
+        "y": 1760,
         "wires": []
     },
     {
@@ -1592,7 +1592,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 380,
-        "y": 1340,
+        "y": 1420,
         "wires": [
             [
                 "1e6fda6795125b08"
@@ -1608,7 +1608,7 @@
         "action": "",
         "pretty": false,
         "x": 690,
-        "y": 1340,
+        "y": 1420,
         "wires": [
             [
                 "8e422978ce287b05",
@@ -1621,7 +1621,7 @@
         "type": "debug",
         "z": "a7fd0d8f86ef3876",
         "name": "debug 3",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1629,7 +1629,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 880,
-        "y": 1420,
+        "y": 1500,
         "wires": []
     },
     {
@@ -1637,7 +1637,7 @@
         "type": "function",
         "z": "a7fd0d8f86ef3876",
         "name": "Pump Command",
-        "func": "// Allow real pump requests when ALL checks below pass.\n// false = observation only; true = allow command transmission.\nconst ENABLE_COMMANDS = true;\n\n// ESP32 publishes its current mode, readiness, and session here.\nconst STATUS_TOPIC = \"/smartplant/esp32-01/status/control\";\n\n// Node-RED publishes pump requests here for the ESP32.\nconst COMMAND_TOPIC = \"/smartplant/esp32-01/control/pump\";\n\n// Current time as milliseconds since the Unix epoch.\n// The computer running Node-RED needs an accurate clock.\nconst now = Date.now();\n\n// Incoming payload must already be a parsed JavaScript object.\nconst data = msg.payload;\n\n\n// ── 1. Receive and cache ESP32 status ──────────────────────────\n\n// This Function receives two kinds of messages:\n// - ESP32 status messages\n// - Decisions from Gradient Boosting Policy Preview\n//\n// Identify status messages by their MQTT topic.\nif (msg.topic === STATUS_TOPIC) {\n\n    // Ignore retained status delivered by the broker.\n    // It may describe an old ESP32 session or operating condition.\n    if (msg.retain) {\n        return [\n            null,\n            {payload: {result: \"blocked\", reason: \"retained_status\"}}\n        ];\n    }\n\n    // Require a non-empty session identifier from the ESP32.\n    // The firmware changes its session after reconnect/mode changes.\n    if (!data || typeof data.session !== \"string\" || !data.session) {\n        return null;\n    }\n\n    // Save the latest status and its local receipt time.\n    // Node context retains values between messages for this Function.\n    context.set(\"pump_status\", {\n        received: now,\n        data: data\n    });\n\n    // A status update only refreshes the cache.\n    // It does not trigger a watering request.\n    return null;\n}\n\n\n// ── 2. Helper for reporting blocked requests ───────────────────\n\nfunction blocked(reason) {\n    // First output: null → no MQTT command.\n    // Second output: diagnostic object → Debug.\n    return [\n        null,\n        {\n            payload: {\n                result: \"blocked\",\n                reason: reason,\n                evaluated_at_utc: new Date(now).toISOString()\n            }\n        }\n    ];\n}\n\n\n// ── 3. Require the intended policy decision ────────────────────\n\n// Accept only the expected device, model, horizon, and decision.\n//\n// \"preview\" describes the upstream policy message format.\n// It is separate from the ESP32's operating mode, checked later.\n//\n// Any \"hold\" or \"reject\" decision stops here.\nif (\n    !data ||\n    data.device !== \"esp32-01\" ||\n    data.mode !== \"preview\" ||\n    data.model !== \"gradient_boosting\" ||\n    data.horizon !== \"10m\" ||\n    data.decision !== \"would_water\"\n) {\n    return blocked(\"no_qualifying_decision\");\n}\n\n\n// ── 4. Check forecast timestamps ──────────────────────────────\n\n// Convert ISO timestamps into epoch milliseconds.\nconst origin = Date.parse(data.origin_utc);\nconst target = Date.parse(data.target_time_utc);\n\n// Require:\n// - A valid forecast origin.\n// - Origin is not in the future.\n// - Forecast origin is no more than 90 seconds old.\n// - Target is exactly 10 minutes after origin.\n//\n// 90,000 ms = 90 seconds.\n// 600,000 ms = 10 minutes.\nif (\n    !Number.isFinite(origin) ||\n    origin > now ||\n    now - origin > 90000 ||\n    target - origin !== 600000\n) {\n    return blocked(\"stale_or_invalid_forecast\");\n}\n\n\n// ── 5. Check moisture conditions independently ────────────────\n\n// Recheck the numbers even though the preview policy checked them.\n//\n// Predicted moisture must be between 0% and 60%, inclusive.\n// Current minute-average moisture must be between 0% and 70%,\n// excluding 70%.\n//\n// The ESP32 also checks its own local sensor readings later.\nif (\n    typeof data.predicted_moisture !== \"number\" ||\n    !Number.isFinite(data.predicted_moisture) ||\n    data.predicted_moisture < 0 ||\n    data.predicted_moisture > 60 ||\n    typeof data.current_moisture !== \"number\" ||\n    !Number.isFinite(data.current_moisture) ||\n    data.current_moisture < 0 ||\n    data.current_moisture >= 70\n) {\n    return blocked(\"invalid_moisture\");\n}\n\n\n// ── 6. Require recent ESP32 status ─────────────────────────────\n\nconst cached = context.get(\"pump_status\");\n\n// Reject if no status has arrived, its receipt time is in the\n// future, or it was received more than 15 seconds ago.\n//\n// This checks receipt age; it is not a sensor timestamp check.\nif (\n    !cached ||\n    now - cached.received > 15000 ||\n    cached.received > now\n) {\n    return blocked(\"waiting_for_fresh_esp32_status\");\n}\n\nconst status = cached.data;\n\n// ESP32 must explicitly report:\n// - Predictive operating mode.\n// - Ready to accept a predictive request.\n// - Pump is OFF.\n// - No remaining cooldown.\n//\n// predictive_ready includes the firmware's readiness checks,\n// such as clock, sensor conditions, and timer availability.\nif (\n    status.mode !== \"predictive\" ||\n    status.predictive_ready !== true ||\n    status.pump_on !== false ||\n    status.cooldown_remaining_ms !== 0\n) {\n    return blocked(\"esp32_not_ready\");\n}\n\n\n// ── 7. Check the command enable switch ─────────────────────────\n\n// With commands disabled, diagnostics still run,\n// but no pump request can leave output 1.\nif (!ENABLE_COMMANDS) {\n    return blocked(\"observation_only_commands_disabled\");\n}\n\n\n// ── 8. Reject repeated forecasts and enforce local cooldown ───\n\nconst previous = context.get(\"last_pump_request\");\n\n// If a request was previously sent:\n// - Do not reuse its forecast origin or an older origin.\n// - Wait at least five minutes after that request.\n//\n// 300,000 ms = 5 minutes.\n//\n// This is Node-RED's additional cooldown.\n// ESP32 independently enforces its own cooldown.\nif (\n    previous &&\n    (\n        origin <= previous.origin ||\n        now - previous.sent < 300000\n    )\n) {\n    return blocked(\"duplicate_or_local_cooldown\");\n}\n\n\n// ── 9. Build the pump request ──────────────────────────────────\n\nconst command = {\n\n    // Identifies this request using ESP32 session + forecast origin.\n    command_id: status.session + \"-\" + origin,\n\n    // Binds the request to the ESP32's current control session.\n    session: status.session,\n\n    // Request one bounded pulse, not continuous operation.\n    action: \"pulse\",\n\n    // Requested pump ON time: 500 milliseconds = 0.5 seconds.\n    duration_ms: 500,\n\n    // Time this request was created.\n    issued_at_epoch_ms: now,\n\n    // ESP32 must reject it after 15 seconds.\n    // This expiry is separate from the 10-minute forecast horizon.\n    expires_at_epoch_ms: now + 15000,\n\n    // Original time from which the forecast was made.\n    origin_epoch_ms: origin,\n\n    // Record which prediction caused the request.\n    model: \"gradient_boosting\",\n    horizon: \"10m\",\n    predicted_moisture: data.predicted_moisture\n};\n\n\n// ── 10. Record the request before sending ──────────────────────\n\n// Start Node-RED's cooldown immediately.\n//\n// Even if MQTT delivery fails or ESP32 rejects the request,\n// Node-RED still waits five minutes before another request.\n// This deliberately avoids rapid retries.\ncontext.set(\"last_pump_request\", {\n    origin: origin,\n    sent: now\n});\n\n\n// ── 11. Send to the two Function outputs ───────────────────────\n\nreturn [\n    {\n        // OUTPUT 1 → MQTT out\n        topic: COMMAND_TOPIC,\n\n        // Convert the command object into JSON text for MQTT.\n        payload: JSON.stringify(command),\n\n        // QoS 0: delivery is not guaranteed.\n        qos: \"0\",\n\n        // Do not store this actuator command as a retained message.\n        retain: false\n    },\n    {\n        // OUTPUT 2 → Debug\n        payload: {\n            result: \"request_sent\",\n            command: command\n        }\n    }\n];",
+        "func": "// One Function node, TWO outputs: 1 -> MQTT out, 2 -> Debug.\n// Inputs: policy-preview messages AND parsed status/control messages.\n// Start in observation mode. Change to true only after firmware upload/testing.\nconst ENABLE_COMMANDS = true;\nconst STATUS_TOPIC = \"/smartplant/esp32-01/status/control\";\nconst COMMAND_TOPIC = \"/smartplant/esp32-01/control/pump\";\nconst now = Date.now();\nlet data = msg.payload;\n\nif (msg.topic === STATUS_TOPIC) {\n    if (msg.retain) return [null, {payload: {result: \"blocked\", reason: \"retained_status\"}}];\n    // Accept either parsed objects or JSON text from MQTT/JSON nodes.\n    // This avoids silently dropping a status that was stringified upstream.\n    if (typeof Buffer !== \"undefined\" && Buffer.isBuffer(data)) data = data.toString(\"utf8\");\n    if (typeof data === \"string\") {\n        try { data = JSON.parse(data); }\n        catch (error) {\n            return [null, {payload: {result: \"blocked\", reason: \"invalid_status_json\"}}];\n        }\n    }\n    if (!data || typeof data !== \"object\" || Array.isArray(data) ||\n        typeof data.session !== \"string\" || !data.session) {\n        return [null, {payload: {result: \"blocked\", reason: \"invalid_status_payload\",\n            payload_type: typeof data, expected: \"object with non-empty session\"}}];\n    }\n    context.set(\"pump_status\", {received: now, data: data});\n    return [null, {payload: {result: \"status_cached\", topic: msg.topic,\n        mode: data.mode, predictive_ready: data.predictive_ready,\n        received_at_utc: new Date(now).toISOString()}}];\n}\n\nfunction blocked(reason) {\n    return [null, {payload: {result: \"blocked\", reason: reason,\n        evaluated_at_utc: new Date(now).toISOString()}}];\n}\n// A status-shaped object arriving under another topic cannot update the cache.\nif (data && typeof data === \"object\" && typeof data.session === \"string\") {\n    return [null, {payload: {result: \"blocked\", reason: \"unexpected_status_topic\",\n        received_topic: msg.topic || \"(missing)\", expected_topic: STATUS_TOPIC}}];\n}\nif (!data || data.device !== \"esp32-01\" || data.mode !== \"preview\"\n    || data.model !== \"gradient_boosting\" || data.horizon !== \"10m\"\n    || data.decision !== \"would_water\") return blocked(\"no_qualifying_decision\");\nconst origin = Date.parse(data.origin_utc);\nconst target = Date.parse(data.target_time_utc);\nif (!Number.isFinite(origin) || origin > now || now - origin > 90000\n    || target - origin !== 600000) return blocked(\"stale_or_invalid_forecast\");\nif (typeof data.predicted_moisture !== \"number\" || !Number.isFinite(data.predicted_moisture)\n    || data.predicted_moisture < 0 || data.predicted_moisture > 60\n    || typeof data.current_moisture !== \"number\" || !Number.isFinite(data.current_moisture)\n    || data.current_moisture < 0 || data.current_moisture >= 70) return blocked(\"invalid_moisture\");\nconst cached = context.get(\"pump_status\");\nif (!cached || now - cached.received > 15000 || cached.received > now) {\n    return [null, {payload: {result: \"blocked\", reason: \"waiting_for_fresh_esp32_status\",\n        cache_present: Boolean(cached), status_age_ms: cached ? now - cached.received : null,\n        evaluated_at_utc: new Date(now).toISOString()}}];\n}\nconst status = cached.data;\nif (status.mode !== \"predictive\" || status.predictive_ready !== true\n    || status.pump_on !== false || status.cooldown_remaining_ms !== 0)\n    return blocked(\"esp32_not_ready\");\nif (!ENABLE_COMMANDS) return blocked(\"observation_only_commands_disabled\");\nconst previous = context.get(\"last_pump_request\");\nif (previous && (origin <= previous.origin || now - previous.sent < 300000))\n    return blocked(\"duplicate_or_local_cooldown\");\nconst command = {\n    command_id: status.session + \"-\" + origin,\n    session: status.session,\n    action: \"pulse\",\n    duration_ms: 500,\n    issued_at_epoch_ms: now,\n    expires_at_epoch_ms: now + 15000,\n    origin_epoch_ms: origin,\n    model: \"gradient_boosting\",\n    horizon: \"10m\",\n    predicted_moisture: data.predicted_moisture\n};\n// Conservative: even a lost/rejected request starts the local cooldown.\n// This is a request, NOT confirmation that watering occurred.\ncontext.set(\"last_pump_request\", {origin: origin, sent: now});\nreturn [{topic: COMMAND_TOPIC, payload: JSON.stringify(command), qos: \"0\", retain: false},\n    {payload: {result: \"request_sent\", command: command}}];\n",
         "outputs": 2,
         "timeout": 0,
         "noerr": 0,
@@ -1645,7 +1645,7 @@
         "finalize": "",
         "libs": [],
         "x": 1110,
-        "y": 1340,
+        "y": 1420,
         "wires": [
             [
                 "0898ba3d1ed77af9"
@@ -1668,7 +1668,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1360,
-        "y": 1420,
+        "y": 1500,
         "wires": []
     },
     {
@@ -1685,7 +1685,7 @@
         "rh": 0,
         "inputs": 0,
         "x": 410,
-        "y": 1500,
+        "y": 1580,
         "wires": [
             [
                 "71a013338e7d2b9b"
@@ -1701,7 +1701,7 @@
         "action": "",
         "pretty": false,
         "x": 690,
-        "y": 1500,
+        "y": 1580,
         "wires": [
             [
                 "a9b2999876e5a4cc"
@@ -1721,7 +1721,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 880,
-        "y": 1500,
+        "y": 1580,
         "wires": []
     },
     {
@@ -1739,7 +1739,7 @@
         "expiry": "",
         "broker": "323cb69482501dbf",
         "x": 1450,
-        "y": 1340,
+        "y": 1420,
         "wires": []
     },
     {
@@ -1755,7 +1755,7 @@
         "finalize": "",
         "libs": [],
         "x": 1120,
-        "y": 1420,
+        "y": 1500,
         "wires": [
             [
                 "09b6f0cf53694992",
@@ -1776,7 +1776,7 @@
         "statusVal": "",
         "statusType": "auto",
         "x": 1360,
-        "y": 1540,
+        "y": 1620,
         "wires": []
     },
     {
@@ -1793,8 +1793,27 @@
         "org": "Student",
         "bucket": "SmartPlantIoT",
         "x": 1400,
-        "y": 1480,
+        "y": 1560,
         "wires": []
+    },
+    {
+        "id": "d2e598169c4cfb65",
+        "type": "function",
+        "z": "a7fd0d8f86ef3876",
+        "name": "Pump Command Backup",
+        "func": "// Allow real pump requests when ALL checks below pass.\n// false = observation only; true = allow command transmission.\nconst ENABLE_COMMANDS = true;\n\n// ESP32 publishes its current mode, readiness, and session here.\nconst STATUS_TOPIC = \"/smartplant/esp32-01/status/control\";\n\n// Node-RED publishes pump requests here for the ESP32.\nconst COMMAND_TOPIC = \"/smartplant/esp32-01/control/pump\";\n\n// Current time as milliseconds since the Unix epoch.\n// The computer running Node-RED needs an accurate clock.\nconst now = Date.now();\n\n// Incoming payload must already be a parsed JavaScript object.\nconst data = msg.payload;\n\n\n// ── 1. Receive and cache ESP32 status ──────────────────────────\n\n// This Function receives two kinds of messages:\n// - ESP32 status messages\n// - Decisions from Gradient Boosting Policy Preview\n//\n// Identify status messages by their MQTT topic.\nif (msg.topic === STATUS_TOPIC) {\n\n    // Ignore retained status delivered by the broker.\n    // It may describe an old ESP32 session or operating condition.\n    if (msg.retain) {\n        return [\n            null,\n            {payload: {result: \"blocked\", reason: \"retained_status\"}}\n        ];\n    }\n\n    // Require a non-empty session identifier from the ESP32.\n    // The firmware changes its session after reconnect/mode changes.\n    if (!data || typeof data.session !== \"string\" || !data.session) {\n        return null;\n    }\n\n    // Save the latest status and its local receipt time.\n    // Node context retains values between messages for this Function.\n    context.set(\"pump_status\", {\n        received: now,\n        data: data\n    });\n\n    // A status update only refreshes the cache.\n    // It does not trigger a watering request.\n    return null;\n}\n\n\n// ── 2. Helper for reporting blocked requests ───────────────────\n\nfunction blocked(reason) {\n    // First output: null → no MQTT command.\n    // Second output: diagnostic object → Debug.\n    return [\n        null,\n        {\n            payload: {\n                result: \"blocked\",\n                reason: reason,\n                evaluated_at_utc: new Date(now).toISOString()\n            }\n        }\n    ];\n}\n\n\n// ── 3. Require the intended policy decision ────────────────────\n\n// Accept only the expected device, model, horizon, and decision.\n//\n// \"preview\" describes the upstream policy message format.\n// It is separate from the ESP32's operating mode, checked later.\n//\n// Any \"hold\" or \"reject\" decision stops here.\nif (\n    !data ||\n    data.device !== \"esp32-01\" ||\n    data.mode !== \"preview\" ||\n    data.model !== \"gradient_boosting\" ||\n    data.horizon !== \"10m\" ||\n    data.decision !== \"would_water\"\n) {\n    return blocked(\"no_qualifying_decision\");\n}\n\n\n// ── 4. Check forecast timestamps ──────────────────────────────\n\n// Convert ISO timestamps into epoch milliseconds.\nconst origin = Date.parse(data.origin_utc);\nconst target = Date.parse(data.target_time_utc);\n\n// Require:\n// - A valid forecast origin.\n// - Origin is not in the future.\n// - Forecast origin is no more than 90 seconds old.\n// - Target is exactly 10 minutes after origin.\n//\n// 90,000 ms = 90 seconds.\n// 600,000 ms = 10 minutes.\nif (\n    !Number.isFinite(origin) ||\n    origin > now ||\n    now - origin > 90000 ||\n    target - origin !== 600000\n) {\n    return blocked(\"stale_or_invalid_forecast\");\n}\n\n\n// ── 5. Check moisture conditions independently ────────────────\n\n// Recheck the numbers even though the preview policy checked them.\n//\n// Predicted moisture must be between 0% and 60%, inclusive.\n// Current minute-average moisture must be between 0% and 70%,\n// excluding 70%.\n//\n// The ESP32 also checks its own local sensor readings later.\nif (\n    typeof data.predicted_moisture !== \"number\" ||\n    !Number.isFinite(data.predicted_moisture) ||\n    data.predicted_moisture < 0 ||\n    data.predicted_moisture > 60 ||\n    typeof data.current_moisture !== \"number\" ||\n    !Number.isFinite(data.current_moisture) ||\n    data.current_moisture < 0 ||\n    data.current_moisture >= 70\n) {\n    return blocked(\"invalid_moisture\");\n}\n\n\n// ── 6. Require recent ESP32 status ─────────────────────────────\n\nconst cached = context.get(\"pump_status\");\n\n// Reject if no status has arrived, its receipt time is in the\n// future, or it was received more than 15 seconds ago.\n//\n// This checks receipt age; it is not a sensor timestamp check.\nif (\n    !cached ||\n    now - cached.received > 15000 ||\n    cached.received > now\n) {\n    return blocked(\"waiting_for_fresh_esp32_status\");\n}\n\nconst status = cached.data;\n\n// ESP32 must explicitly report:\n// - Predictive operating mode.\n// - Ready to accept a predictive request.\n// - Pump is OFF.\n// - No remaining cooldown.\n//\n// predictive_ready includes the firmware's readiness checks,\n// such as clock, sensor conditions, and timer availability.\nif (\n    status.mode !== \"predictive\" ||\n    status.predictive_ready !== true ||\n    status.pump_on !== false ||\n    status.cooldown_remaining_ms !== 0\n) {\n    return blocked(\"esp32_not_ready\");\n}\n\n\n// ── 7. Check the command enable switch ─────────────────────────\n\n// With commands disabled, diagnostics still run,\n// but no pump request can leave output 1.\nif (!ENABLE_COMMANDS) {\n    return blocked(\"observation_only_commands_disabled\");\n}\n\n\n// ── 8. Reject repeated forecasts and enforce local cooldown ───\n\nconst previous = context.get(\"last_pump_request\");\n\n// If a request was previously sent:\n// - Do not reuse its forecast origin or an older origin.\n// - Wait at least five minutes after that request.\n//\n// 300,000 ms = 5 minutes.\n//\n// This is Node-RED's additional cooldown.\n// ESP32 independently enforces its own cooldown.\nif (\n    previous &&\n    (\n        origin <= previous.origin ||\n        now - previous.sent < 300000\n    )\n) {\n    return blocked(\"duplicate_or_local_cooldown\");\n}\n\n\n// ── 9. Build the pump request ──────────────────────────────────\n\nconst command = {\n\n    // Identifies this request using ESP32 session + forecast origin.\n    command_id: status.session + \"-\" + origin,\n\n    // Binds the request to the ESP32's current control session.\n    session: status.session,\n\n    // Request one bounded pulse, not continuous operation.\n    action: \"pulse\",\n\n    // Requested pump ON time: 500 milliseconds = 0.5 seconds.\n    duration_ms: 500,\n\n    // Time this request was created.\n    issued_at_epoch_ms: now,\n\n    // ESP32 must reject it after 15 seconds.\n    // This expiry is separate from the 10-minute forecast horizon.\n    expires_at_epoch_ms: now + 15000,\n\n    // Original time from which the forecast was made.\n    origin_epoch_ms: origin,\n\n    // Record which prediction caused the request.\n    model: \"gradient_boosting\",\n    horizon: \"10m\",\n    predicted_moisture: data.predicted_moisture\n};\n\n\n// ── 10. Record the request before sending ──────────────────────\n\n// Start Node-RED's cooldown immediately.\n//\n// Even if MQTT delivery fails or ESP32 rejects the request,\n// Node-RED still waits five minutes before another request.\n// This deliberately avoids rapid retries.\ncontext.set(\"last_pump_request\", {\n    origin: origin,\n    sent: now\n});\n\n\n// ── 11. Send to the two Function outputs ───────────────────────\n\nreturn [\n    {\n        // OUTPUT 1 → MQTT out\n        topic: COMMAND_TOPIC,\n\n        // Convert the command object into JSON text for MQTT.\n        payload: JSON.stringify(command),\n\n        // QoS 0: delivery is not guaranteed.\n        qos: \"0\",\n\n        // Do not store this actuator command as a retained message.\n        retain: false\n    },\n    {\n        // OUTPUT 2 → Debug\n        payload: {\n            result: \"request_sent\",\n            command: command\n        }\n    }\n];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 350,
+        "y": 1340,
+        "wires": [
+            [],
+            []
+        ]
     },
     {
         "id": "323cb69482501dbf",
@@ -1901,14 +1920,14 @@
     {
         "id": "6fd1287c5957b6a9",
         "type": "ui-group",
-        "name": "Kontrol Pompa",
+        "name": "Kontrol AIoT",
         "page": "de304870d854a21c",
         "width": "3",
         "height": 1,
         "order": 2,
         "showTitle": true,
         "className": "",
-        "visible": "true",
+        "visible": true,
         "disabled": "false",
         "groupType": "default"
     },
@@ -1988,7 +2007,7 @@
         }
     },
     {
-        "id": "37bf51e37e52c5ef",
+        "id": "4f7bce9f79d680f2",
         "type": "global-config",
         "env": [],
         "modules": {
