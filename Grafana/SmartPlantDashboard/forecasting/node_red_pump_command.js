@@ -5,18 +5,38 @@ const ENABLE_COMMANDS = false;
 const STATUS_TOPIC = "/smartplant/esp32-01/status/control";
 const COMMAND_TOPIC = "/smartplant/esp32-01/control/pump";
 const now = Date.now();
-const data = msg.payload;
+let data = msg.payload;
 
 if (msg.topic === STATUS_TOPIC) {
     if (msg.retain) return [null, {payload: {result: "blocked", reason: "retained_status"}}];
-    if (!data || typeof data.session !== "string" || !data.session) return null;
+    // Accept either parsed objects or JSON text from MQTT/JSON nodes.
+    // This avoids silently dropping a status that was stringified upstream.
+    if (typeof Buffer !== "undefined" && Buffer.isBuffer(data)) data = data.toString("utf8");
+    if (typeof data === "string") {
+        try { data = JSON.parse(data); }
+        catch (error) {
+            return [null, {payload: {result: "blocked", reason: "invalid_status_json"}}];
+        }
+    }
+    if (!data || typeof data !== "object" || Array.isArray(data) ||
+        typeof data.session !== "string" || !data.session) {
+        return [null, {payload: {result: "blocked", reason: "invalid_status_payload",
+            payload_type: typeof data, expected: "object with non-empty session"}}];
+    }
     context.set("pump_status", {received: now, data: data});
-    return null;
+    return [null, {payload: {result: "status_cached", topic: msg.topic,
+        mode: data.mode, predictive_ready: data.predictive_ready,
+        received_at_utc: new Date(now).toISOString()}}];
 }
 
 function blocked(reason) {
     return [null, {payload: {result: "blocked", reason: reason,
         evaluated_at_utc: new Date(now).toISOString()}}];
+}
+// A status-shaped object arriving under another topic cannot update the cache.
+if (data && typeof data === "object" && typeof data.session === "string") {
+    return [null, {payload: {result: "blocked", reason: "unexpected_status_topic",
+        received_topic: msg.topic || "(missing)", expected_topic: STATUS_TOPIC}}];
 }
 if (!data || data.device !== "esp32-01" || data.mode !== "preview"
     || data.model !== "gradient_boosting" || data.horizon !== "10m"
@@ -30,8 +50,11 @@ if (typeof data.predicted_moisture !== "number" || !Number.isFinite(data.predict
     || typeof data.current_moisture !== "number" || !Number.isFinite(data.current_moisture)
     || data.current_moisture < 0 || data.current_moisture >= 70) return blocked("invalid_moisture");
 const cached = context.get("pump_status");
-if (!cached || now - cached.received > 15000 || cached.received > now)
-    return blocked("waiting_for_fresh_esp32_status");
+if (!cached || now - cached.received > 15000 || cached.received > now) {
+    return [null, {payload: {result: "blocked", reason: "waiting_for_fresh_esp32_status",
+        cache_present: Boolean(cached), status_age_ms: cached ? now - cached.received : null,
+        evaluated_at_utc: new Date(now).toISOString()}}];
+}
 const status = cached.data;
 if (status.mode !== "predictive" || status.predictive_ready !== true
     || status.pump_on !== false || status.cooldown_remaining_ms !== 0)

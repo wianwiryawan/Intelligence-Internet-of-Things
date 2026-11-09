@@ -93,6 +93,8 @@ The node only describes whether moisture conditions qualify. It does NOT check r
 
 The command Function needs TWO outputs: output 1 -> MQTT out (control/pump, QoS 0, retain false); output 2 -> Debug. Feed parsed status/control MQTT messages and policy-preview decisions into it. The sender defaults to `ENABLE_COMMANDS = false`, allowing observation before physical tests. Do not enable until the updated firmware has been compiled/uploaded and the documented checks are understood. The current sketch remains off after reboot until a mode is explicitly chosen. Tests: `node test_pump_command.js`.
 
+Status reception now accepts objects or JSON text on the exact status/control topic, and reports `status_cached` on output 2 whenever a fresh status is cached. Invalid JSON/session and unexpected topics are reported explicitly. Waiting diagnostics include cache_present and status_age_ms: false means no status was cached in this Function's context; age >15000 means updates stopped. Connect status and policy to the SAME Function instance. Context is per node, not shared by similarly named Function nodes. Replacing/redeploying the Function may require waiting for its next status message. Keep the existing live ENABLE_COMMANDS preference when copying an update; the file's default remains false.
+
 Run `node test_gradient_policy.js` for policy regression checks.
 
 ### Store policy decisions and explanations in Grafana
